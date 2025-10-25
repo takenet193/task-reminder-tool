@@ -135,12 +135,12 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-# データファイル（必要に応じてコメントアウト）
-# data/tasks.json
-# data/logs.json
+# データファイル（個人のタスクデータ）
+data/tasks.json
+data/logs.json
 
-# MCP設定ファイル（生成されるファイル）
-mcp_config.json
+# MCP設定ファイル（個人設定）
+.cursor/mcp.json
 
 # ログファイル
 *.log
