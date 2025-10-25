@@ -1,3 +1,30 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "task_001",
+      "time": "15:20",
+      "task_names": [
+        "ラシクラ",
+        "終了報告",
+        "実績記録表"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "task_002",
+      "time": "15:07",
+      "task_names": [
+        "テスト"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "task_003",
+      "time": "15:10",
+      "task_names": [
+        "テスト２"
+      ],
+      "enabled": true
+    }
+  ]
 }

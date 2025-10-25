@@ -1,3 +1,39 @@
 {
-  "logs": []
+  "logs": [
+    {
+      "date": "2025-10-25",
+      "time": "14:55",
+      "task_id": "task_001",
+      "task_name": "ラシクラ",
+      "completed": true
+    },
+    {
+      "date": "2025-10-25",
+      "time": "14:55",
+      "task_id": "task_001",
+      "task_name": "終了報告",
+      "completed": true
+    },
+    {
+      "date": "2025-10-25",
+      "time": "14:55",
+      "task_id": "task_001",
+      "task_name": "実績記録表",
+      "completed": true
+    },
+    {
+      "date": "2025-10-25",
+      "time": "15:06",
+      "task_id": "task_002",
+      "task_name": "テスト",
+      "completed": true
+    },
+    {
+      "date": "2025-10-25",
+      "time": "15:12",
+      "task_id": "task_002",
+      "task_name": "テスト",
+      "completed": true
+    }
+  ]
 }
