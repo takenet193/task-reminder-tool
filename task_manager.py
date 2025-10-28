@@ -4,6 +4,7 @@
 """
 import threading
 import time
+import re
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Callable
 from config import Config
@@ -98,8 +99,8 @@ class TaskManager:
     def _should_trigger_notification(self, current_time: datetime, target_time: datetime, 
                                    task_id: str, notification_type: str) -> bool:
         """通知をトリガーすべきかを判定"""
-        # 通知キーを生成
-        notification_key = f"{task_id}_{target_time.date()}_{notification_type}"
+        # 通知キーを生成（タスクID + 日付_時刻 + 通知タイプ）
+        notification_key = f"{task_id}_{target_time.strftime('%Y-%m-%d_%H:%M')}_{notification_type}"
         
         # 既に通知済みの場合はスキップ
         if notification_key in self.active_notifications:
@@ -142,14 +143,16 @@ class TaskManager:
         return [task for task in tasks if task.get("enabled", True)]
     
     def clear_notification_history(self):
-        """通知履歴をクリア（日付が変わった時など）"""
-        today = datetime.now().date()
-        keys_to_remove = []
+        """通知履歴をクリア（当日以外のキーを削除）"""
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        # パターン例: _2025-10-28_14:30_
+        pattern = re.compile(rf"_{today_str}_\d{{2}}:\d{{2}}_")
         
-        for key in self.active_notifications.keys():
-            # キーから日付を抽出して比較
-            if not key.endswith(f"_{today}"):
+        keys_to_remove = []
+        for key in list(self.active_notifications.keys()):
+            if not pattern.search(key):
                 keys_to_remove.append(key)
         
         for key in keys_to_remove:
             del self.active_notifications[key]
+
