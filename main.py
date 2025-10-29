@@ -12,13 +12,10 @@ def main():
     # タスクマネージャーを初期化
     task_manager = TaskManager()
     
-    # リマインダーウィンドウを初期化
-    reminder_window = ReminderWindow(task_manager)
-    
-    # 通知コールバックを設定
-    task_manager.set_notification_callback('pre_notification', reminder_window.show_pre_notification)
-    task_manager.set_notification_callback('main_notification', reminder_window.show_main_notification)
-    task_manager.set_notification_callback('warning_notification', reminder_window.show_warning_notification)
+    # 通知コールバックを設定（通知ごとに新しいウィンドウを生成）
+    task_manager.set_notification_callback('pre_notification', lambda task: ReminderWindow(task_manager).show_pre_notification(task))
+    task_manager.set_notification_callback('main_notification', lambda task: ReminderWindow(task_manager).show_main_notification(task))
+    task_manager.set_notification_callback('warning_notification', lambda task: ReminderWindow(task_manager).show_warning_notification(task))
     
     # メインウィンドウを初期化
     main_window = MainWindow(task_manager)

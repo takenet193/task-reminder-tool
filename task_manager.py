@@ -21,6 +21,7 @@ class TaskManager:
             'warning_notification': None  # 警告通知コールバック
         }
         self.active_notifications = {}  # アクティブな通知を追跡
+        self.last_main_shown_at = {}  # 各タスクの本通知表示時刻
         
     def set_notification_callback(self, notification_type: str, callback: Callable):
         """通知コールバックを設定"""
@@ -78,11 +79,18 @@ class TaskManager:
                     
                     # 警告通知(5分後、未完了の場合)
                     warning_time = today_task_time + timedelta(minutes=5)
-                    if self._should_trigger_notification(current_time, warning_time, 
-                                                       task["id"], "warning"):
-                        # タスクが未完了の場合のみ警告通知を発火
-                        if not self._is_task_completed(task["id"], current_time.strftime('%Y-%m-%d')):
-                            self._trigger_warning_notification(task)
+                    # 本通知優先: 直近の本通知から10分以内は同一タスクの警告を抑止
+                    suppress_warning = False
+                    last_main = self.last_main_shown_at.get(task["id"]) 
+                    if last_main is not None and (current_time - last_main) <= timedelta(minutes=10):
+                        suppress_warning = True
+
+                    if not suppress_warning:
+                        if self._should_trigger_notification(current_time, warning_time, 
+                                                            task["id"], "warning"):
+                            # タスクが未完了の場合のみ警告通知を発火
+                            if not self._is_task_completed(task["id"], current_time.strftime('%Y-%m-%d')):
+                                self._trigger_warning_notification(task)
                 
                 time.sleep(10)  # 10秒間隔でチェック
                 
@@ -123,6 +131,11 @@ class TaskManager:
     
     def _trigger_main_notification(self, task: Dict[str, Any]):
         """本通知をトリガー"""
+        # 本通知表示時刻を記録（競合抑止用）
+        try:
+            self.last_main_shown_at[task["id"]] = datetime.now()
+        except Exception:
+            pass
         if self.notification_callbacks['main_notification']:
             self.notification_callbacks['main_notification'](task)
     
