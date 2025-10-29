@@ -80,7 +80,9 @@ class TaskManager:
                     warning_time = today_task_time + timedelta(minutes=5)
                     if self._should_trigger_notification(current_time, warning_time, 
                                                        task["id"], "warning"):
-                        self._trigger_warning_notification(task)
+                        # タスクが未完了の場合のみ警告通知を発火
+                        if not self._is_task_completed(task["id"], current_time.strftime('%Y-%m-%d')):
+                            self._trigger_warning_notification(task)
                 
                 time.sleep(10)  # 10秒間隔でチェック
                 
@@ -141,6 +143,43 @@ class TaskManager:
         """今日のタスク一覧を取得"""
         tasks = self.config.load_tasks()
         return [task for task in tasks if task.get("enabled", True)]
+    
+    def _is_task_completed(self, task_id: str, date: str) -> bool:
+        """タスクが完全に完了しているかを判定
+        
+        Args:
+            task_id: タスクID
+            date: 日付文字列 (YYYY-MM-DD)
+            
+        Returns:
+            bool: すべてのサブタスクが完了している場合True
+        """
+        try:
+            # 指定日のログを取得
+            logs = self.config.get_logs_by_date(date)
+            
+            # 該当タスクの完了ログを抽出
+            completed_logs = [
+                log for log in logs 
+                if log["task_id"] == task_id and log["completed"] == True
+            ]
+            
+            # タスクのサブタスク数を取得
+            tasks = self.config.load_tasks()
+            task = next((t for t in tasks if t["id"] == task_id), None)
+            
+            if not task:
+                return False  # タスクが見つからない場合は未完了
+            
+            expected_count = len(task.get("task_names", []))
+            actual_count = len(completed_logs)
+            
+            # すべてのサブタスクが完了しているかチェック
+            return actual_count >= expected_count and expected_count > 0
+            
+        except Exception as e:
+            print(f"タスク完了判定中にエラーが発生しました: {e}")
+            return False  # エラー時は未完了として扱う
     
     def clear_notification_history(self):
         """通知履歴をクリア（当日以外のキーを削除）"""
