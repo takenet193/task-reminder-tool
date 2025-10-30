@@ -23,6 +23,32 @@ class ReminderWindow:
         self.can_close = False
         self.complete_button = None
         
+    def _clear_contents(self):
+        """ウィンドウ内の既存ウィジェットをクリア"""
+        for child in list(self.root.winfo_children()):
+            try:
+                child.destroy()
+            except Exception:
+                pass
+
+    def switch_to_warning_mode(self):
+        """本通知ウィンドウを警告表示に切り替える"""
+        if not self.root or not self.root.winfo_exists():
+            return
+        self.notification_type = 'warning'
+        self._clear_contents()
+        # 警告用のサイズへ変更
+        self.root.geometry("380x220")
+        # 再構築
+        self._setup_warning_notification()
+        # 画面中央へ
+        self._position_window()
+        try:
+            self.root.lift()
+            self.root.focus_force()
+        except Exception:
+            pass
+
     def show_pre_notification(self, task: Dict[str, Any]):
         """予告通知を表示"""
         self.notification_type = 'pre'
@@ -174,26 +200,12 @@ class ReminderWindow:
                                  font=("Arial", 14, "bold"), foreground="red")
         warning_label.pack(pady=(0, 10))
         
-        # 未完了サブタスクのチェックボックスを表示
-        # 当日完了済みのタスク名を取得
-        completed_set = set()
-        try:
-            from datetime import datetime as _dt
-            today_str = _dt.now().strftime('%Y-%m-%d')
-            logs = self.task_manager.config.get_logs_by_date(today_str)
-            for log in logs:
-                if log.get("task_id") == self.task.get("id") and log.get("completed"):
-                    completed_set.add(log.get("task_name"))
-        except Exception:
-            completed_set = set()
-
-        remaining_tasks = [name for name in self.task.get('task_names', []) if name not in completed_set]
-
+        # 全サブタスクのチェックボックスを表示（フィルタしない）
         task_list_frame = ttk.Frame(frame)
         task_list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
         self.checkboxes = []
-        for task_name in remaining_tasks:
+        for task_name in self.task.get('task_names', []):
             var = tk.BooleanVar()
             cb = ttk.Checkbutton(task_list_frame, text=task_name, variable=var,
                                  command=self._check_completion)
