@@ -21,6 +21,7 @@ class TaskManager:
             'warning_notification': None  # 警告通知コールバック
         }
         self.active_notifications = {}  # アクティブな通知を追跡
+        self.open_windows = {}  # 各タスクの開いている通知ウィンドウ
         
     def set_notification_callback(self, notification_type: str, callback: Callable):
         """通知コールバックを設定"""
@@ -125,6 +126,25 @@ class TaskManager:
         """本通知をトリガー"""
         if self.notification_callbacks['main_notification']:
             self.notification_callbacks['main_notification'](task)
+
+    # ===== ウィンドウ登録・参照 =====
+    def register_window(self, task_id: str, window: Any):
+        try:
+            self.open_windows[task_id] = window
+        except Exception:
+            pass
+
+    def get_window(self, task_id: str):
+        win = self.open_windows.get(task_id)
+        # 生存確認。死んでいればクリーンアップ
+        try:
+            if win is None or not win.window_exists():
+                if task_id in self.open_windows:
+                    del self.open_windows[task_id]
+                return None
+        except Exception:
+            return None
+        return win
     
     def _trigger_warning_notification(self, task: Dict[str, Any]):
         """警告通知をトリガー"""
