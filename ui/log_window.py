@@ -31,7 +31,7 @@ class LogWindow:
         """ログ画面を作成"""
         self.root = tk.Toplevel()
         self.root.title("ログ・達成率")
-        self.root.geometry("1000x800")
+        self.root.geometry("600x400")
         self.root.resizable(True, True)
         
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -91,12 +91,17 @@ class LogWindow:
         notebook.add(self.achievement_frame, text="月間達成率")
         self._create_achievement_tab()
         
-        # タブ2: 未達成率グラフ
+        # タブ2: 対象日設定
+        self.target_days_frame = ttk.Frame(notebook)
+        notebook.add(self.target_days_frame, text="対象日設定")
+        self._create_target_days_tab()
+        
+        # タブ3: 未達成率グラフ
         self.graph_frame = ttk.Frame(notebook)
         notebook.add(self.graph_frame, text="未達成率グラフ")
         self._create_graph_tab()
         
-        # タブ3: 詳細ログ
+        # タブ4: 詳細ログ
         self.detail_frame = ttk.Frame(notebook)
         notebook.add(self.detail_frame, text="詳細ログ")
         self._create_detail_tab()
@@ -116,9 +121,24 @@ class LogWindow:
         self.achievement_label = ttk.Label(stats_frame, text="", font=("Arial", 16, "bold"))
         self.achievement_label.pack()
         
+        # カレンダー表示フレーム
+        calendar_frame = ttk.Frame(self.achievement_frame, padding="10")
+        calendar_frame.pack(fill=tk.BOTH, expand=True)
+        
+        ttk.Label(calendar_frame, text="カレンダー表示", font=("Arial", 12, "bold")).pack(anchor=tk.W, pady=(0, 10))
+        
+        self.calendar_text = tk.Text(calendar_frame, height=25, width=60)
+        calendar_scrollbar = ttk.Scrollbar(calendar_frame, orient=tk.VERTICAL, command=self.calendar_text.yview)
+        self.calendar_text.configure(yscrollcommand=calendar_scrollbar.set)
+        
+        self.calendar_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        calendar_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    
+    def _create_target_days_tab(self):
+        """対象日設定タブを作成"""
         # 設定フレーム
-        settings_frame = ttk.Frame(self.achievement_frame, padding="10")
-        settings_frame.pack(fill=tk.X, pady=(0, 10))
+        settings_frame = ttk.Frame(self.target_days_frame, padding="10")
+        settings_frame.pack(fill=tk.BOTH, expand=True)
         
         ttk.Label(settings_frame, text="対象日設定", font=("Arial", 12, "bold")).pack(anchor=tk.W, pady=(0, 5))
         
@@ -133,13 +153,13 @@ class LogWindow:
         
         # カレンダーグリッドフレーム
         calendar_grid_frame = ttk.Frame(settings_frame)
-        calendar_grid_frame.pack(fill=tk.BOTH, expand=True)
+        calendar_grid_frame.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
         
         # カレンダーグリッド用のスクロール可能なフレーム
         canvas_frame = tk.Frame(calendar_grid_frame)
         canvas_frame.pack(fill=tk.BOTH, expand=True)
         
-        canvas = tk.Canvas(canvas_frame, height=300)
+        canvas = tk.Canvas(canvas_frame, height=400)
         scrollbar = ttk.Scrollbar(canvas_frame, orient=tk.VERTICAL, command=canvas.yview)
         scrollable_frame = ttk.Frame(canvas)
         
@@ -156,20 +176,7 @@ class LogWindow:
         
         self.calendar_grid_frame = scrollable_frame
         self.calendar_day_vars = {}  # {day: tk.BooleanVar}
-        
-        # カレンダー表示フレーム
-        calendar_frame = ttk.Frame(self.achievement_frame, padding="10")
-        calendar_frame.pack(fill=tk.BOTH, expand=True)
-        
-        ttk.Label(calendar_frame, text="カレンダー表示", font=("Arial", 12, "bold")).pack(anchor=tk.W, pady=(0, 10))
-        
-        self.calendar_text = tk.Text(calendar_frame, height=25, width=60)
-        calendar_scrollbar = ttk.Scrollbar(calendar_frame, orient=tk.VERTICAL, command=self.calendar_text.yview)
-        self.calendar_text.configure(yscrollcommand=calendar_scrollbar.set)
-        
-        self.calendar_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        calendar_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
+    
     def _create_graph_tab(self):
         """未達成率グラフタブを作成"""
         # matplotlib の設定
@@ -275,7 +282,12 @@ class LogWindow:
             label = ttk.Label(self.calendar_grid_frame, text=weekday, width=8)
             label.grid(row=0, column=i, padx=2, pady=2)
         
+        # 月の1日の曜日を取得して、配置開始位置を決定
+        first_day = datetime(year, month, 1).date()
+        first_day_weekday = first_day.weekday()  # 0=月曜日, 6=日曜日
+        
         row = 1
+        col = first_day_weekday  # 1日の曜日の位置から開始
         
         # 各日のチェックボックスを作成
         for day in range(1, last_day + 1):
