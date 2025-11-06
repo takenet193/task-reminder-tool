@@ -4,6 +4,7 @@
 """
 import threading
 import time
+import re
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Callable
 from config import Config
@@ -20,6 +21,7 @@ class TaskManager:
             'warning_notification': None  # 警告通知コールバック
         }
         self.active_notifications = {}  # アクティブな通知を追跡
+        self.open_windows = {}  # 各タスクの開いている通知ウィンドウ
         
     def set_notification_callback(self, notification_type: str, callback: Callable):
         """通知コールバックを設定"""
@@ -79,7 +81,9 @@ class TaskManager:
                     warning_time = today_task_time + timedelta(minutes=5)
                     if self._should_trigger_notification(current_time, warning_time, 
                                                        task["id"], "warning"):
-                        self._trigger_warning_notification(task)
+                        # タスクが未完了の場合のみ警告通知を発火
+                        if not self._is_task_completed(task["id"], current_time.strftime('%Y-%m-%d')):
+                            self._trigger_warning_notification(task)
                 
                 time.sleep(10)  # 10秒間隔でチェック
                 
@@ -98,8 +102,8 @@ class TaskManager:
     def _should_trigger_notification(self, current_time: datetime, target_time: datetime, 
                                    task_id: str, notification_type: str) -> bool:
         """通知をトリガーすべきかを判定"""
-        # 通知キーを生成
-        notification_key = f"{task_id}_{target_time.date()}_{notification_type}"
+        # 通知キーを生成（タスクID + 日付_時刻 + 通知タイプ）
+        notification_key = f"{task_id}_{target_time.strftime('%Y-%m-%d_%H:%M')}_{notification_type}"
         
         # 既に通知済みの場合はスキップ
         if notification_key in self.active_notifications:
@@ -122,6 +126,25 @@ class TaskManager:
         """本通知をトリガー"""
         if self.notification_callbacks['main_notification']:
             self.notification_callbacks['main_notification'](task)
+
+    # ===== ウィンドウ登録・参照 =====
+    def register_window(self, task_id: str, window: Any):
+        try:
+            self.open_windows[task_id] = window
+        except Exception:
+            pass
+
+    def get_window(self, task_id: str):
+        win = self.open_windows.get(task_id)
+        # 生存確認。死んでいればクリーンアップ
+        try:
+            if win is None or not win.window_exists():
+                if task_id in self.open_windows:
+                    del self.open_windows[task_id]
+                return None
+        except Exception:
+            return None
+        return win
     
     def _trigger_warning_notification(self, task: Dict[str, Any]):
         """警告通知をトリガー"""
@@ -141,15 +164,54 @@ class TaskManager:
         tasks = self.config.load_tasks()
         return [task for task in tasks if task.get("enabled", True)]
     
-    def clear_notification_history(self):
-        """通知履歴をクリア（日付が変わった時など）"""
-        today = datetime.now().date()
-        keys_to_remove = []
+    def _is_task_completed(self, task_id: str, date: str) -> bool:
+        """タスクが完全に完了しているかを判定
         
-        for key in self.active_notifications.keys():
-            # キーから日付を抽出して比較
-            if not key.endswith(f"_{today}"):
+        Args:
+            task_id: タスクID
+            date: 日付文字列 (YYYY-MM-DD)
+            
+        Returns:
+            bool: すべてのサブタスクが完了している場合True
+        """
+        try:
+            # 指定日のログを取得
+            logs = self.config.get_logs_by_date(date)
+            
+            # 該当タスクの完了ログを抽出
+            completed_logs = [
+                log for log in logs 
+                if log["task_id"] == task_id and log["completed"] == True
+            ]
+            
+            # タスクのサブタスク数を取得
+            tasks = self.config.load_tasks()
+            task = next((t for t in tasks if t["id"] == task_id), None)
+            
+            if not task:
+                return False  # タスクが見つからない場合は未完了
+            
+            expected_count = len(task.get("task_names", []))
+            actual_count = len(completed_logs)
+            
+            # すべてのサブタスクが完了しているかチェック
+            return actual_count >= expected_count and expected_count > 0
+            
+        except Exception as e:
+            print(f"タスク完了判定中にエラーが発生しました: {e}")
+            return False  # エラー時は未完了として扱う
+    
+    def clear_notification_history(self):
+        """通知履歴をクリア（当日以外のキーを削除）"""
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        # パターン例: _2025-10-28_14:30_
+        pattern = re.compile(rf"_{today_str}_\d{{2}}:\d{{2}}_")
+        
+        keys_to_remove = []
+        for key in list(self.active_notifications.keys()):
+            if not pattern.search(key):
                 keys_to_remove.append(key)
         
         for key in keys_to_remove:
             del self.active_notifications[key]
+

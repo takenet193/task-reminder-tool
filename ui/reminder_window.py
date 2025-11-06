@@ -21,7 +21,34 @@ class ReminderWindow:
         self.checkboxes = []
         self.auto_close_timer = None
         self.can_close = False
+        self.complete_button = None
         
+    def _clear_contents(self):
+        """ウィンドウ内の既存ウィジェットをクリア"""
+        for child in list(self.root.winfo_children()):
+            try:
+                child.destroy()
+            except Exception:
+                pass
+
+    def switch_to_warning_mode(self):
+        """本通知ウィンドウを警告表示に切り替える"""
+        if not self.root or not self.root.winfo_exists():
+            return
+        self.notification_type = 'warning'
+        self._clear_contents()
+        # 警告用のサイズへ変更
+        self.root.geometry("380x220")
+        # 再構築
+        self._setup_warning_notification()
+        # 画面中央へ
+        self._position_window()
+        try:
+            self.root.lift()
+            self.root.focus_force()
+        except Exception:
+            pass
+
     def show_pre_notification(self, task: Dict[str, Any]):
         """予告通知を表示"""
         self.notification_type = 'pre'
@@ -53,35 +80,56 @@ class ReminderWindow:
             
         self.root = tk.Toplevel()
         self.root.overrideredirect(True)  # タイトルバーを削除
-        self.root.attributes('-alpha', 0.8)  # 半透明
-        
-        # ウィンドウサイズと位置を設定
+        # 常に最前面に表示（不透明）
+        self.root.attributes('-topmost', True)
+
+        # ウィンドウサイズを設定（やや大きめ）
         if self.notification_type == 'pre':
-            self.root.geometry("250x80")
+            self.root.geometry("300x110")
         elif self.notification_type == 'main':
-            self.root.geometry("300x200")
+            self.root.geometry("360x260")
         else:  # warning
-            self.root.geometry("350x150")
-            
+            self.root.geometry("380x220")
+        
         self._position_window()
         
         # ドラッグ機能を追加
         self._add_drag_functionality()
         
+        # 初期表示で前面に出す
+        try:
+            self.root.lift()
+            self.root.focus_force()
+        except Exception:
+            pass
+        
     def _position_window(self):
         """ウィンドウの位置を設定"""
+        self.root.update_idletasks()
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
-        
-        if self.notification_type == 'warning':
-            # 警告通知は画面中央に表示
-            x = (screen_width - 350) // 2
-            y = (screen_height - 150) // 2
-        else:
-            # 予告通知と本通知は左下に表示
-            x = 50
-            y = screen_height - 200
-            
+
+        # すべて中央に表示
+        # 現在のウィンドウサイズを取得
+        try:
+            width = self.root.winfo_width()
+            height = self.root.winfo_height()
+            # winfo_width が 1 になることがあるため、geometry から推定
+            if width <= 1 or height <= 1:
+                geo = self.root.geometry()
+                size_part = geo.split('+', 1)[0]
+                width, height = map(int, size_part.split('x'))
+        except Exception:
+            # フォールバック（通知タイプ別の既定値）
+            if self.notification_type == 'pre':
+                width, height = 300, 110
+            elif self.notification_type == 'main':
+                width, height = 360, 260
+            else:
+                width, height = 380, 220
+
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
         self.root.geometry(f"+{x}+{y}")
         
     def _add_drag_functionality(self):
@@ -133,10 +181,11 @@ class ReminderWindow:
             checkbox.pack(anchor=tk.W, pady=2)
             self.checkboxes.append((task_name, var))
             
-        # 完了ボタン
-        complete_button = ttk.Button(frame, text="完了", 
-                                   command=self._complete_tasks)
-        complete_button.pack(pady=(10, 0))
+        # 完了ボタン（全チェック完了まで無効化）
+        self.complete_button = ttk.Button(frame, text="完了", 
+                                          command=self._complete_tasks)
+        self.complete_button.pack(pady=(10, 0))
+        self.complete_button.configure(state=tk.DISABLED)
         
         # 初期状態では閉じられない
         self.can_close = False
@@ -151,43 +200,70 @@ class ReminderWindow:
                                  font=("Arial", 14, "bold"), foreground="red")
         warning_label.pack(pady=(0, 10))
         
-        # タスク名
-        task_label = ttk.Label(frame, text=f"未完了タスク: {', '.join(self.task['task_names'])}", 
-                              font=("Arial", 10))
-        task_label.pack(pady=(0, 10))
-        
-        # 確認ボタン
+        # 全サブタスクのチェックボックスを表示（フィルタしない）
+        task_list_frame = ttk.Frame(frame)
+        task_list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+
+        self.checkboxes = []
+        for task_name in self.task.get('task_names', []):
+            var = tk.BooleanVar()
+            cb = ttk.Checkbutton(task_list_frame, text=task_name, variable=var,
+                                 command=self._check_completion)
+            cb.pack(anchor=tk.W, pady=2)
+            self.checkboxes.append((task_name, var))
+
+        # ボタン
         button_frame = ttk.Frame(frame)
         button_frame.pack()
-        
-        complete_button = ttk.Button(button_frame, text="今すぐ実行", 
-                                   command=self._complete_tasks)
-        complete_button.pack(side=tk.LEFT, padx=(0, 5))
-        
-        close_button = ttk.Button(button_frame, text="後で実行", 
-                                command=self._close_warning)
+
+        self.complete_button = ttk.Button(button_frame, text="完了",
+                                          command=self._complete_tasks)
+        self.complete_button.pack(side=tk.LEFT, padx=(0, 5))
+        # 警告では1件以上チェックで有効化
+        self.complete_button.configure(state=(tk.NORMAL if any(var.get() for _, var in self.checkboxes) else tk.DISABLED))
+
+        close_button = ttk.Button(button_frame, text="後で実行",
+                                  command=self._close_warning)
         close_button.pack(side=tk.LEFT, padx=(5, 0))
         
     def _check_completion(self):
         """チェックボックスの状態を確認"""
-        if self.notification_type != 'main':
-            return
-            
-        # すべてのチェックボックスがチェックされているか確認
-        all_checked = all(var.get() for _, var in self.checkboxes)
-        self.can_close = all_checked
+        # 本通知: すべてチェックで完了可能
+        if self.notification_type == 'main':
+            all_checked = all(var.get() for _, var in self.checkboxes)
+            self.can_close = all_checked
+            if self.complete_button:
+                self.complete_button.configure(state=(tk.NORMAL if all_checked else tk.DISABLED))
+        # 警告通知: 1件以上チェックで完了可能
+        elif self.notification_type == 'warning':
+            any_checked = any(var.get() for _, var in self.checkboxes)
+            if self.complete_button:
+                self.complete_button.configure(state=(tk.NORMAL if any_checked else tk.DISABLED))
         
     def _complete_tasks(self):
         """タスク完了処理"""
         if self.notification_type == 'main':
+            # すべてチェックされていない場合は警告
+            all_checked = all(var.get() for _, var in self.checkboxes)
+            if not all_checked:
+                from tkinter import messagebox
+                messagebox.showwarning("未完了", "すべての項目にチェックを入れてください。")
+                return
             # チェックされたタスクをログに記録
             for task_name, var in self.checkboxes:
                 if var.get():
                     self.task_manager.mark_task_completed(self.task['id'], task_name)
         elif self.notification_type == 'warning':
-            # 警告通知から実行した場合もログに記録
-            for task_name in self.task['task_names']:
-                self.task_manager.mark_task_completed(self.task['id'], task_name)
+            # 警告通知ではチェックされたものだけ記録
+            any_checked = False
+            for task_name, var in self.checkboxes:
+                if var.get():
+                    self.task_manager.mark_task_completed(self.task['id'], task_name)
+                    any_checked = True
+            if not any_checked:
+                from tkinter import messagebox
+                messagebox.showinfo("情報", "完了にチェックされた項目がありません。")
+                return
                 
         self._close_window()
         
