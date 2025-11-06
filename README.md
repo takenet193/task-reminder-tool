@@ -24,13 +24,18 @@
 - バックグラウンドでの時刻監視
 - 設定画面・ログ画面へのアクセス
 
+### 5. 達成率計算設定
+- **週末除外設定**: 土日を達成率計算から除外する設定
+- **カレンダーオーバーライド**: 日単位で達成率の対象日を個別に設定可能
+  - 週末除外設定を有効にしても、特定の土日を含めることが可能
+  - 平日でも特定の日を除外することが可能
+
 ## インストール・使用方法
 
 ### 必要な環境
 - Python 3.7以上
 - tkinter（Python標準ライブラリ）
 - matplotlib
-- Node.js（MCP連携用）
 
 ### インストール手順
 
@@ -51,8 +56,12 @@ pip install -r requirements.txt
 cp mcp_setup/env.example .env
 # .envファイルを編集してGitHubトークンを設定
 
-# MCP設定ファイルを生成
-powershell -ExecutionPolicy Bypass -File "mcp_setup\scripts\generate_mcp_config.ps1" -WorkspacePath "."
+# MCP設定ファイルを生成（ワークスペースパスは絶対パスで指定してください）
+# PowerShell（Windows）
+powershell -ExecutionPolicy Bypass -File "mcp_setup\scripts\generate_mcp_config.ps1" -WorkspacePath "C:\path\to\your\workspace"
+
+# Bash（Linux/macOS）
+bash mcp_setup/scripts/generate_mcp_config.sh /path/to/your/workspace
 ```
 
 4. アプリケーションを起動
@@ -80,6 +89,7 @@ python main.py
 4. **ログ・達成率の確認**
    - メインウィンドウの「ログ・達成率」ボタンをクリック
    - 月ごとの達成率とグラフを確認
+   - 「対象日設定」タブで週末除外設定やカレンダーオーバーライドを設定可能
 
 ## PC起動時の自動起動設定
 
@@ -156,11 +166,15 @@ python main.py
 3. **MCP設定ファイルの生成**
    ```bash
    # PowerShell（Windows）
-   powershell -ExecutionPolicy Bypass -File "mcp_setup\scripts\generate_mcp_config.ps1" -WorkspacePath "."
+   # ワークスペースパスは絶対パスで指定してください
+   powershell -ExecutionPolicy Bypass -File "mcp_setup\scripts\generate_mcp_config.ps1" -WorkspacePath "C:\path\to\your\workspace"
    
    # Bash（Linux/macOS）
-   bash mcp_setup/scripts/generate_mcp_config.sh .
+   # ワークスペースパスは絶対パスで指定してください
+   bash mcp_setup/scripts/generate_mcp_config.sh /path/to/your/workspace
    ```
+   
+   **注意**: `filesystem` MCPは絶対パスが必要です。相対パスでは動作しません。
 
 4. **Cursorでの設定**
    - Cursorの設定でMCP設定ファイル（`mcp_config.json`）を指定
@@ -179,11 +193,12 @@ python main.py
 │   ├── settings_window.py # タスク設定画面
 │   └── log_window.py      # ログ・達成率表示画面
 ├── utils/
-│   ├── logger.py          # ログ記録機能
-│   └── scheduler.py       # 時刻監視・通知タイミング制御
+│   └── __init__.py        # ユーティリティパッケージ初期化
 ├── data/
 │   ├── tasks.json         # タスク設定データ
-│   └── logs.json          # タスク完了履歴
+│   ├── logs.json          # タスク完了履歴
+│   ├── settings.json      # アプリケーション設定（週末除外設定など）
+│   └── calendar_overrides.json # カレンダーオーバーライド設定
 ├── mcp_setup/             # MCP設定テンプレート
 │   ├── mcp_config.template.json
 │   ├── env.example
@@ -200,6 +215,8 @@ python main.py
 
 - **tasks.json**: タスク設定データ
 - **logs.json**: タスク完了履歴
+- **settings.json**: アプリケーション設定（週末除外設定など）
+- **calendar_overrides.json**: カレンダーオーバーライド設定（日単位での達成率対象日設定）
 
 これらのファイルは`data/`フォルダに保存され、アプリケーションが自動的に管理します。
 
@@ -224,7 +241,7 @@ python main.py
    - `.env`ファイルがプロジェクトルートに存在するか確認
    - `mcp_config.json`が正しく生成されているか確認
    - CursorのMCP設定で設定ファイルのパスが正しいか確認
-   - Node.jsがインストールされているか確認
+   - MCP設定ファイル生成時にワークスペースパスを絶対パスで指定したか確認
 
 ### ログの確認
 

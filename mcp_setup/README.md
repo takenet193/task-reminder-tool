@@ -11,7 +11,7 @@
 
 ## 使い方（最短）
 1. `.env` をプロジェクトルートに作成（`env.example`を参考）し、`GITHUB_PERSONAL_ACCESS_TOKEN` を設定
-2. `mcp_template/` を新規プロジェクトへコピー
+2. `mcp_setup/` を新規プロジェクトへコピー
 3. スクリプトを実行して `mcp_config.json` を生成
 4. Cursor 設定でこの `mcp_config.json` を参照
 
