@@ -144,3 +144,6 @@ data/logs.json
 
 # ログファイル
 *.log
+
+# runtime data
+data/
