@@ -26,4 +26,10 @@ disallow_incomplete_defs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
 
-
+# tkinterは型スタブが不完全なため、UI関連のエラーを無視
+[[tool.mypy.overrides]]
+module = [
+    "tkinter.*",
+    "ui.*",
+]
+ignore_errors = true
