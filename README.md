@@ -158,7 +158,7 @@ python main.py
    ```bash
    # .envファイルを作成
    cp mcp_setup/env.example .env
-   
+
    # .envファイルを編集してトークンを設定
    GITHUB_PERSONAL_ACCESS_TOKEN=your_actual_token_here
    ```
@@ -168,12 +168,12 @@ python main.py
    # PowerShell（Windows）
    # ワークスペースパスは絶対パスで指定してください
    powershell -ExecutionPolicy Bypass -File "mcp_setup\scripts\generate_mcp_config.ps1" -WorkspacePath "C:\path\to\your\workspace"
-   
+
    # Bash（Linux/macOS）
    # ワークスペースパスは絶対パスで指定してください
    bash mcp_setup/scripts/generate_mcp_config.sh /path/to/your/workspace
    ```
-   
+
    **注意**: `filesystem` MCPは絶対パスが必要です。相対パスでは動作しません。
 
 4. **Cursorでの設定**

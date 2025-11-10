@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "items": [
+    { "id": "setup-tooling", "title": "Lint/Format/型設定", "status": "completed", "actual_start_date": null, "actual_end_date": null },
+    { "id": "io-safety", "title": "原子的書き込み・ロック・バックアップ/復旧", "status": "planned", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": null, "actual_end_date": null },
+    { "id": "logging", "title": "ロギング導入", "status": "planned", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": null, "actual_end_date": null },
+    { "id": "schedule-model", "title": "スケジュール拡張", "status": "planned", "start_date": "2025-11-11", "end_date": "2025-11-12", "actual_start_date": null, "actual_end_date": null },
+    { "id": "schedule-ui", "title": "スケジュールUI", "status": "pending", "deps": ["schedule-model"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "notifications", "title": "通知ディスパッチ", "status": "pending", "deps": ["schedule-model"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "platform-ui", "title": "Win/Mac表示差異吸収", "status": "pending", "actual_start_date": null, "actual_end_date": null },
+    { "id": "tests-core", "title": "テスト/カバレッジ80%", "status": "planned", "deps": ["io-safety", "schedule-model"], "start_date": "2025-11-13", "end_date": "2025-11-14", "target_coverage": ">=60% by 2025-11-14 (80% later)", "actual_start_date": null, "actual_end_date": null },
+    { "id": "ci-quality", "title": "CI品質ゲート", "status": "planned", "deps": ["tests-core"], "start_date": "2025-11-14", "end_date": "2025-11-14", "actual_start_date": null, "actual_end_date": null },
+    { "id": "package-win", "title": "Windows配布", "status": "planned", "deps": ["ci-quality"], "start_date": "2025-11-17", "end_date": "2025-11-17", "actual_start_date": null, "actual_end_date": null },
+    { "id": "package-mac", "title": "macOS配布", "status": "pending", "deps": ["platform-ui", "ci-quality"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "mcp-automation", "title": "MCP自動化", "status": "pending", "deps": ["ci-quality"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "demo-gif", "title": "デモGIF作成", "status": "pending", "deps": ["schedule-ui", "notifications"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "arch-diagrams", "title": "アーキ図/通知シーケンス図", "status": "pending", "deps": ["notifications"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "docs", "title": "README/ARCHITECTURE/CHANGELOG更新", "status": "planned", "deps": ["package-win"], "start_date": "2025-11-18", "end_date": "2025-11-19", "actual_start_date": null, "actual_end_date": null }
+  ],
+  "notes": {
+    "strategy": ".cursor/git-strategy.md を参照",
+    "base_branch": "develop"
+  }
+}
