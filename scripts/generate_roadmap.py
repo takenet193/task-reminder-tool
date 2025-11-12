@@ -170,10 +170,8 @@ def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
             lines.append(f"  {title}  :{start_date}, {duration:.1f}d")
 
     # Coreタスク（実績）- 実績日付があるもののみ
-    has_core_actual = any(
-        item.get("actual_start_date") and item.get("actual_end_date")
-        for item in categorized["core"]
-    )
+    # actual_start_dateがあるタスクを検出（actual_end_dateがある場合も、ない場合も含む）
+    has_core_actual = any(item.get("actual_start_date") for item in categorized["core"])
     if has_core_actual:
         lines.extend(
             [
@@ -181,13 +179,20 @@ def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
                 "  section Core Actual",
             ]
         )
+        today = datetime.now().strftime("%Y-%m-%d")
         for item in categorized["core"]:
             actual_start_date = item.get("actual_start_date")
             actual_end_date = item.get("actual_end_date")
-            if actual_start_date and actual_end_date:
+            if actual_start_date:
                 title = item.get("title", "")
-                duration = calculate_duration(actual_start_date, actual_end_date)
-                lines.append(f"  {title}  :crit, {actual_start_date}, {duration:.1f}d")
+                # 終了日がある場合はその日まで、ない場合は今日まで
+                end_date_for_calc = actual_end_date if actual_end_date else today
+                duration = calculate_duration(actual_start_date, end_date_for_calc)
+                # 進捗率を取得して表示
+                progress_perc = item.get("progress_perc", 0) or 0
+                lines.append(
+                    f"  {title} ({progress_perc}%)  :crit, {actual_start_date}, {duration:.1f}d"
+                )
 
     # Stretchタスク（計画）
     lines.extend(
@@ -204,11 +209,15 @@ def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
             title = item.get("title", "")
             duration = calculate_duration(start_date, end_date)
             lines.append(f"  {title}  :{start_date}, {duration:.1f}d")
+        elif not start_date and not end_date:
+            # start_dateがないStretchタスクはコメントとして追加
+            title = item.get("title", "")
+            lines.append(f"  %% {title} (日付未定)")
 
     # Stretchタスク（実績）- 実績日付があるもののみ
+    # actual_start_dateがあるタスクを検出（actual_end_dateがある場合も、ない場合も含む）
     has_stretch_actual = any(
-        item.get("actual_start_date") and item.get("actual_end_date")
-        for item in categorized["stretch"]
+        item.get("actual_start_date") for item in categorized["stretch"]
     )
     if has_stretch_actual:
         lines.extend(
@@ -217,13 +226,20 @@ def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
                 "  section Stretch Actual",
             ]
         )
+        today = datetime.now().strftime("%Y-%m-%d")
         for item in categorized["stretch"]:
             actual_start_date = item.get("actual_start_date")
             actual_end_date = item.get("actual_end_date")
-            if actual_start_date and actual_end_date:
+            if actual_start_date:
                 title = item.get("title", "")
-                duration = calculate_duration(actual_start_date, actual_end_date)
-                lines.append(f"  {title}  :crit, {actual_start_date}, {duration:.1f}d")
+                # 終了日がある場合はその日まで、ない場合は今日まで
+                end_date_for_calc = actual_end_date if actual_end_date else today
+                duration = calculate_duration(actual_start_date, end_date_for_calc)
+                # 進捗率を取得して表示
+                progress_perc = item.get("progress_perc", 0) or 0
+                lines.append(
+                    f"  {title} ({progress_perc}%)  :crit, {actual_start_date}, {duration:.1f}d"
+                )
 
     lines.extend(
         [

@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "items": [
-    { "id": "setup-tooling", "title": "Lint/Format/型設定", "status": "completed", "actual_start_date": "2025-11-08", "actual_end_date": "2025-11-08" },
-    { "id": "io-safety", "title": "原子的書き込み・ロック・バックアップ/復旧", "status": "planned", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": null, "actual_end_date": null },
-    { "id": "logging", "title": "ロギング導入", "status": "planned", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": null, "actual_end_date": null },
+    { "id": "setup-tooling", "title": "Lint/Format/型設定", "status": "completed", "actual_start_date": "2025-11-08", "actual_end_date": "2025-11-08", "progress_perc": 100 },
+    { "id": "io-safety", "title": "原子的書き込み・ロック・バックアップ/復旧", "status": "completed", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": "2025-11-04", "actual_end_date": "2025-11-04", "progress_perc": 100 },
+    { "id": "logging", "title": "ロギング導入", "status": "completed", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": "2025-11-04", "actual_end_date": "2025-11-04", "progress_perc": 100 },
     { "id": "schedule-model", "title": "スケジュール拡張", "status": "planned", "start_date": "2025-11-11", "end_date": "2025-11-12", "actual_start_date": null, "actual_end_date": null },
     { "id": "schedule-ui", "title": "スケジュールUI", "status": "pending", "deps": ["schedule-model"], "actual_start_date": null, "actual_end_date": null },
     { "id": "notifications", "title": "通知ディスパッチ", "status": "pending", "deps": ["schedule-model"], "actual_start_date": null, "actual_end_date": null },
