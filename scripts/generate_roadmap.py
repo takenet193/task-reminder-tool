@@ -127,19 +127,26 @@ def format_task_markdown(item: dict) -> str:
 
 
 def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
-    """Mermaidガントチャートを生成（計画と実績の両方を表示）"""
+    """Mermaidガントチャートを生成（Core/Stretchの2セクションで、各タスクの計画と実績を連続表示）"""
     # 最新の終了日を計算（実績日付と計画日付の両方を考慮）
     max_end_date = None
     all_items = categorized["core"] + categorized["stretch"]
+    today = datetime.now().strftime("%Y-%m-%d")
+
     for item in all_items:
         actual_end_date = item.get("actual_end_date")
         end_date = item.get("end_date")
+        actual_start_date = item.get("actual_start_date")
 
         # 両方の日付をチェック
         for date_to_check in [actual_end_date, end_date]:
             if date_to_check:
                 if max_end_date is None or date_to_check > max_end_date:
                     max_end_date = date_to_check
+        # actual_start_dateのみの場合は今日の日付も考慮
+        if actual_start_date and not actual_end_date:
+            if max_end_date is None or today > max_end_date:
+                max_end_date = today
 
     # タイトルを動的に生成
     if max_end_date:
@@ -156,89 +163,69 @@ def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
         "gantt",
         "  dateFormat  YYYY-MM-DD",
         f"  title {gantt_title}",
-        "  %% ===== Core Plan =====",
-        "  section Core Plan",
     ]
 
-    # Coreタスク（計画）
-    for item in categorized["core"]:
-        start_date = item.get("start_date")
-        end_date = item.get("end_date")
-        if start_date and end_date:
-            title = item.get("title", "")
-            duration = calculate_duration(start_date, end_date)
-            lines.append(f"  {title}  :{start_date}, {duration:.1f}d")
+    # Coreセクション
+    if categorized["core"]:
+        lines.append("  section Core")
 
-    # Coreタスク（実績）- 実績日付があるもののみ
-    # actual_start_dateがあるタスクを検出（actual_end_dateがある場合も、ない場合も含む）
-    has_core_actual = any(item.get("actual_start_date") for item in categorized["core"])
-    if has_core_actual:
-        lines.extend(
-            [
-                "  %% ===== Core Actual =====",
-                "  section Core Actual",
-            ]
-        )
-        today = datetime.now().strftime("%Y-%m-%d")
         for item in categorized["core"]:
+            title = item.get("title", "")
+            if not title:
+                continue
+
+            # 計画バー（計画日付がある場合）
+            start_date = item.get("start_date")
+            end_date = item.get("end_date")
+            if start_date and end_date:
+                duration = calculate_duration(start_date, end_date)
+                lines.append(f"  {title}  :active, {start_date}, {duration:.1f}d")
+
+            # 実績バー（実績日付がある場合）
             actual_start_date = item.get("actual_start_date")
             actual_end_date = item.get("actual_end_date")
             if actual_start_date:
-                title = item.get("title", "")
                 # 終了日がある場合はその日まで、ない場合は今日まで
                 end_date_for_calc = actual_end_date if actual_end_date else today
                 duration = calculate_duration(actual_start_date, end_date_for_calc)
                 # 進捗率を取得して表示
                 progress_perc = item.get("progress_perc", 0) or 0
+                progress_str = f" ({progress_perc}%)" if progress_perc else ""
                 lines.append(
-                    f"  {title} ({progress_perc}%)  :crit, {actual_start_date}, {duration:.1f}d"
+                    f"  {title} 実績{progress_str}  :crit, {actual_start_date}, {duration:.1f}d"
                 )
 
-    # Stretchタスク（計画）
-    lines.extend(
-        [
-            "  %% ===== Stretch Plan =====",
-            "  section Stretch Plan",
-        ]
-    )
+    # Stretchセクション
+    if categorized["stretch"]:
+        lines.append("  section Stretch")
 
-    for item in categorized["stretch"]:
-        start_date = item.get("start_date")
-        end_date = item.get("end_date")
-        if start_date and end_date:
-            title = item.get("title", "")
-            duration = calculate_duration(start_date, end_date)
-            lines.append(f"  {title}  :{start_date}, {duration:.1f}d")
-        elif not start_date and not end_date:
-            # start_dateがないStretchタスクはコメントとして追加
-            title = item.get("title", "")
-            lines.append(f"  %% {title} (日付未定)")
-
-    # Stretchタスク（実績）- 実績日付があるもののみ
-    # actual_start_dateがあるタスクを検出（actual_end_dateがある場合も、ない場合も含む）
-    has_stretch_actual = any(
-        item.get("actual_start_date") for item in categorized["stretch"]
-    )
-    if has_stretch_actual:
-        lines.extend(
-            [
-                "  %% ===== Stretch Actual =====",
-                "  section Stretch Actual",
-            ]
-        )
-        today = datetime.now().strftime("%Y-%m-%d")
         for item in categorized["stretch"]:
+            title = item.get("title", "")
+            if not title:
+                continue
+
+            # 計画バー（計画日付がある場合）
+            start_date = item.get("start_date")
+            end_date = item.get("end_date")
+            if start_date and end_date:
+                duration = calculate_duration(start_date, end_date)
+                lines.append(f"  {title}  :active, {start_date}, {duration:.1f}d")
+            elif not start_date and not end_date:
+                # start_dateがないStretchタスクはコメントとして追加
+                lines.append(f"  %% {title} (日付未定)")
+
+            # 実績バー（実績日付がある場合）
             actual_start_date = item.get("actual_start_date")
             actual_end_date = item.get("actual_end_date")
             if actual_start_date:
-                title = item.get("title", "")
                 # 終了日がある場合はその日まで、ない場合は今日まで
                 end_date_for_calc = actual_end_date if actual_end_date else today
                 duration = calculate_duration(actual_start_date, end_date_for_calc)
                 # 進捗率を取得して表示
                 progress_perc = item.get("progress_perc", 0) or 0
+                progress_str = f" ({progress_perc}%)" if progress_perc else ""
                 lines.append(
-                    f"  {title} ({progress_perc}%)  :crit, {actual_start_date}, {duration:.1f}d"
+                    f"  {title} 実績{progress_str}  :crit, {actual_start_date}, {duration:.1f}d"
                 )
 
     lines.extend(
