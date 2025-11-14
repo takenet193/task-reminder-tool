@@ -86,6 +86,11 @@ def format_task_markdown(item: dict) -> str:
     # タイトル
     title = item.get("title", "")
 
+    # サマリーとMarkdown参照（任意）
+    summary = item.get("summary")
+    detail_md = item.get("detail_markdown")
+    report_md = item.get("report_markdown")
+
     # 依存関係
     deps = item.get("deps", [])
     dep_str = ""
@@ -123,7 +128,24 @@ def format_task_markdown(item: dict) -> str:
     if "target_coverage" in item:
         extra_info = f"／{item['target_coverage']}"
 
-    return f"- {checkbox} {title}{dep_str}{date_str}{actual_date_str}{extra_info}"
+    # サマリーとリンク情報を1行にまとめる
+    meta_parts: list[str] = []
+    if summary:
+        meta_parts.append(summary)
+
+    link_parts: list[str] = []
+    if detail_md:
+        link_parts.append(f"[仕様]({detail_md})")
+    if report_md and item.get("status") == "completed":
+        link_parts.append(f"[レポート]({report_md})")
+    if link_parts:
+        meta_parts.append(" / ".join(link_parts))
+
+    meta_str = ""
+    if meta_parts:
+        meta_str = "\n    - " + " / ".join(meta_parts)
+
+    return f"- {checkbox} {title}{dep_str}{date_str}{actual_date_str}{extra_info}{meta_str}"
 
 
 def generate_gantt_chart(categorized: dict[str, list[dict]]) -> list[str]:
