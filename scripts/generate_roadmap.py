@@ -135,9 +135,21 @@ def format_task_markdown(item: dict) -> str:
 
     link_parts: list[str] = []
     if detail_md:
-        link_parts.append(f"[仕様]({detail_md})")
+        # docs/ROADMAP.md から見た相対パスに変換（docs/ プレフィックスを削除）
+        relative_detail_md = (
+            detail_md.replace("docs/", "", 1)
+            if detail_md.startswith("docs/")
+            else detail_md
+        )
+        link_parts.append(f"[仕様]({relative_detail_md})")
     if report_md and item.get("status") == "completed":
-        link_parts.append(f"[レポート]({report_md})")
+        # docs/ROADMAP.md から見た相対パスに変換（docs/ プレフィックスを削除）
+        relative_report_md = (
+            report_md.replace("docs/", "", 1)
+            if report_md.startswith("docs/")
+            else report_md
+        )
+        link_parts.append(f"[レポート]({relative_report_md})")
     if link_parts:
         meta_parts.append(" / ".join(link_parts))
 
