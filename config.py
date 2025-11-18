@@ -4,9 +4,12 @@ JSONファイルの読み書きとタスク・ログデータの管理を行う
 """
 
 import json
+import logging
 import os
 from datetime import date, datetime
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class Config:
@@ -67,26 +70,52 @@ class Config:
         try:
             with open(self.tasks_file, encoding="utf-8") as f:
                 data = json.load(f)
-                return data.get("tasks", [])
-        except (FileNotFoundError, json.JSONDecodeError):
+                tasks = data.get("tasks", [])
+                logger.debug(f"タスクデータを読み込みました: {len(tasks)}件")
+                return tasks
+        except FileNotFoundError:
+            logger.debug("タスクファイルが見つかりません。空のリストを返します")
+            return []
+        except json.JSONDecodeError as e:
+            logger.error(
+                f"タスクファイルの読み込みに失敗（JSON形式エラー）: {e}", exc_info=True
+            )
             return []
 
     def save_tasks(self, tasks: list[dict[str, Any]]) -> None:
         """タスクデータを保存"""
-        self._save_tasks(tasks)
+        try:
+            self._save_tasks(tasks)
+            logger.info(f"タスクデータを保存しました: {len(tasks)}件")
+        except Exception as e:
+            logger.error(f"タスクデータの保存に失敗: {e}", exc_info=True)
+            raise
 
     def load_logs(self) -> list[dict[str, Any]]:
         """ログデータをJSONファイルから読み込み"""
         try:
             with open(self.logs_file, encoding="utf-8") as f:
                 data = json.load(f)
-                return data.get("logs", [])
-        except (FileNotFoundError, json.JSONDecodeError):
+                logs = data.get("logs", [])
+                logger.debug(f"ログデータを読み込みました: {len(logs)}件")
+                return logs
+        except FileNotFoundError:
+            logger.debug("ログファイルが見つかりません。空のリストを返します")
+            return []
+        except json.JSONDecodeError as e:
+            logger.error(
+                f"ログファイルの読み込みに失敗（JSON形式エラー）: {e}", exc_info=True
+            )
             return []
 
     def save_logs(self, logs: list[dict[str, Any]]) -> None:
         """ログデータを保存"""
-        self._save_logs(logs)
+        try:
+            self._save_logs(logs)
+            logger.info(f"ログデータを保存しました: {len(logs)}件")
+        except Exception as e:
+            logger.error(f"ログデータの保存に失敗: {e}", exc_info=True)
+            raise
 
     def add_task(self, time: str, task_names: list[str], enabled: bool = True) -> str:
         """新しいタスクを追加"""
@@ -189,13 +218,26 @@ class Config:
         """設定データをJSONファイルから読み込み"""
         try:
             with open(self.settings_file, encoding="utf-8") as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+                settings = json.load(f)
+                logger.debug("設定データを読み込みました")
+                return settings
+        except FileNotFoundError:
+            logger.debug("設定ファイルが見つかりません。デフォルト設定を返します")
+            return {"exclude_weekends": False}
+        except json.JSONDecodeError as e:
+            logger.error(
+                f"設定ファイルの読み込みに失敗（JSON形式エラー）: {e}", exc_info=True
+            )
             return {"exclude_weekends": False}
 
     def save_settings(self, settings: dict[str, Any]) -> None:
         """設定データを保存"""
-        self._save_settings(settings)
+        try:
+            self._save_settings(settings)
+            logger.info("設定データを保存しました")
+        except Exception as e:
+            logger.error(f"設定データの保存に失敗: {e}", exc_info=True)
+            raise
 
     def get_exclude_weekends(self) -> bool:
         """週末除外設定を取得"""
@@ -212,13 +254,31 @@ class Config:
         """カレンダーオーバーライドデータをJSONファイルから読み込み"""
         try:
             with open(self.calendar_overrides_file, encoding="utf-8") as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+                overrides = json.load(f)
+                logger.debug("カレンダーオーバーライドデータを読み込みました")
+                return overrides
+        except FileNotFoundError:
+            logger.debug(
+                "カレンダーオーバーライドファイルが見つかりません。空の辞書を返します"
+            )
+            return {}
+        except json.JSONDecodeError as e:
+            logger.error(
+                f"カレンダーオーバーライドファイルの読み込みに失敗（JSON形式エラー）: {e}",
+                exc_info=True,
+            )
             return {}
 
     def save_calendar_overrides(self, overrides: dict[str, dict[str, bool]]) -> None:
         """カレンダーオーバーライドデータを保存"""
-        self._save_calendar_overrides(overrides)
+        try:
+            self._save_calendar_overrides(overrides)
+            logger.info("カレンダーオーバーライドデータを保存しました")
+        except Exception as e:
+            logger.error(
+                f"カレンダーオーバーライドデータの保存に失敗: {e}", exc_info=True
+            )
+            raise
 
     def get_month_overrides(self, year: int, month: int) -> dict[str, bool]:
         """指定月のオーバーライド設定を取得"""

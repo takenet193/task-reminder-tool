@@ -3,6 +3,7 @@
 タスク履歴と達成率グラフを表示するUI
 """
 
+import logging
 import tkinter as tk
 from datetime import datetime, timedelta
 from tkinter import ttk
@@ -12,6 +13,8 @@ import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+
+logger = logging.getLogger(__name__)
 
 # 日本語フォントの設定
 plt.rcParams["font.family"] = [
@@ -294,13 +297,16 @@ class LogWindow:
 
     def _update_display(self):
         """表示を更新"""
-        year = int(self.year_var.get())
-        month = int(self.month_var.get())
+        try:
+            year = int(self.year_var.get())
+            month = int(self.month_var.get())
 
-        self._update_calendar_grid(year, month)
-        self._update_achievement_tab(year, month)
-        self._update_graph_tab()
-        self._update_detail_tab(year, month)
+            self._update_calendar_grid(year, month)
+            self._update_achievement_tab(year, month)
+            self._update_graph_tab()
+            self._update_detail_tab(year, month)
+        except Exception as e:
+            logger.error(f"表示の更新に失敗: {e}", exc_info=True)
 
     def _on_weekend_toggle(self):
         """週末除外チェックボックスの変更時の処理"""
