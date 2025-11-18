@@ -45,12 +45,14 @@
       "id": "schedule-model",
       "title": "スケジュール拡張",
       "summary": "タスク・スケジュールのモデルを拡張し、柔軟な通知・スヌーズに対応できるようにする。",
-      "status": "planned",
+      "status": "completed",
       "start_date": "2025-11-11",
       "end_date": "2025-11-12",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/schedule-model.md"
+      "actual_start_date": "2025-11-19",
+      "actual_end_date": "2025-11-19",
+      "progress_perc": 100,
+      "detail_markdown": "docs/tasks/schedule-model.md",
+      "report_markdown": "docs/reports/schedule-model.md"
     },
     {
       "id": "schedule-ui",
