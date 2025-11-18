@@ -3,7 +3,6 @@
 設定されたタスクの時刻監視と通知制御を行う
 """
 
-import logging
 import re
 import threading
 import time
@@ -12,8 +11,6 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from config import Config
-
-logger = logging.getLogger(__name__)
 
 
 class TaskManager:
@@ -44,15 +41,12 @@ class TaskManager:
                 target=self._monitor_tasks, daemon=True
             )
             self.monitor_thread.start()
-            logger.info("タスク監視を開始しました")
 
     def stop_monitoring(self) -> None:
         """時刻監視を停止"""
-        if self.running:
-            self.running = False
-            if self.monitor_thread:
-                self.monitor_thread.join()
-            logger.info("タスク監視を停止しました")
+        self.running = False
+        if self.monitor_thread:
+            self.monitor_thread.join()
 
     def _monitor_tasks(self) -> None:
         """タスク監視のメインループ"""
@@ -106,7 +100,7 @@ class TaskManager:
                 time.sleep(10)  # 10秒間隔でチェック
 
             except Exception as e:
-                logger.error(f"タスク監視中にエラーが発生しました: {e}", exc_info=True)
+                print(f"タスク監視中にエラーが発生しました: {e}")
                 time.sleep(10)
 
     def _parse_time(self, time_str: str) -> datetime | None:
@@ -147,13 +141,11 @@ class TaskManager:
     def _trigger_pre_notification(self, task: dict[str, Any]) -> None:
         """予告通知をトリガー"""
         if self.notification_callbacks["pre_notification"]:
-            logger.debug(f"予告通知を発火: タスクID={task['id']}")
             self.notification_callbacks["pre_notification"](task)
 
     def _trigger_main_notification(self, task: dict[str, Any]) -> None:
         """本通知をトリガー"""
         if self.notification_callbacks["main_notification"]:
-            logger.debug(f"本通知を発火: タスクID={task['id']}")
             self.notification_callbacks["main_notification"](task)
 
     # ===== ウィンドウ登録・参照 =====
@@ -178,18 +170,15 @@ class TaskManager:
     def _trigger_warning_notification(self, task: dict[str, Any]) -> None:
         """警告通知をトリガー"""
         if self.notification_callbacks["warning_notification"]:
-            logger.debug(f"警告通知を発火: タスクID={task['id']}")
             self.notification_callbacks["warning_notification"](task)
 
     def mark_task_completed(self, task_id: str, task_name: str) -> None:
         """タスク完了を記録"""
         self.config.add_log(task_id, task_name, True)
-        logger.info(f"タスク完了を記録: タスクID={task_id}, タスク名={task_name}")
 
     def mark_task_incomplete(self, task_id: str, task_name: str) -> None:
         """タスク未完了を記録"""
         self.config.add_log(task_id, task_name, False)
-        logger.info(f"タスク未完了を記録: タスクID={task_id}, タスク名={task_name}")
 
     def get_today_tasks(self) -> list[dict[str, Any]]:
         """今日のタスク一覧を取得"""
@@ -229,7 +218,7 @@ class TaskManager:
             return actual_count >= expected_count and expected_count > 0
 
         except Exception as e:
-            logger.error(f"タスク完了判定中にエラーが発生しました: {e}", exc_info=True)
+            print(f"タスク完了判定中にエラーが発生しました: {e}")
             return False  # エラー時は未完了として扱う
 
     def clear_notification_history(self):
