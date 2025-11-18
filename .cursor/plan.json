@@ -19,13 +19,12 @@
       "id": "io-safety",
       "title": "原子的書き込み・ロック・バックアップ/復旧",
       "summary": "設定・タスクファイルの原子的書き込みとロック、バックアップ/復旧を実装する。",
-      "status": "completed",
+      "status": "planned",
       "start_date": "2025-11-10",
       "end_date": "2025-11-10",
-      "actual_start_date": "2025-11-04",
-      "actual_end_date": "2025-11-04",
-      "progress_perc": 100,
-      "report_markdown": "docs/reports/io-safety.md"
+      "actual_start_date": null,
+      "actual_end_date": null,
+      "detail_markdown": "docs/tasks/io-safety.md"
     },
     {
       "id": "logging",
@@ -34,9 +33,10 @@
       "status": "completed",
       "start_date": "2025-11-10",
       "end_date": "2025-11-10",
-      "actual_start_date": "2025-11-04",
-      "actual_end_date": "2025-11-04",
+      "actual_start_date": "2025-11-18",
+      "actual_end_date": "2025-11-18",
       "progress_perc": 100,
+      "detail_markdown": "docs/tasks/logging.md",
       "report_markdown": "docs/reports/logging.md"
     },
     {
