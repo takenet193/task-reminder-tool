@@ -23,3 +23,19 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: []
+
+  - repo: local
+    hooks:
+      - id: generate-roadmap
+        name: Generate ROADMAP.md from plan.json
+        entry: python scripts/generate_roadmap.py
+        language: system
+        files: ^\.cursor/plan\.json$
+        pass_filenames: false
+
+      - id: generate-future-tasks
+        name: Generate FUTURE_TASKS.md from future-tasks.json
+        entry: python scripts/generate_roadmap.py --input .cursor/future-tasks.json --output docs/FUTURE_TASKS.md --title "将来の改善タスク（上級プログラマー向け）"
+        language: system
+        files: ^\.cursor/future-tasks\.json$
+        pass_filenames: false
