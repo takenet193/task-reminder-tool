@@ -3,12 +3,9 @@
 タスクの追加・編集・削除を行うUI
 """
 
-import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 from typing import TYPE_CHECKING
-
-logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from task_manager import TaskManager
@@ -116,63 +113,51 @@ class SettingsWindow:
 
     def _add_task(self):
         """新しいタスクを追加"""
-        try:
-            dialog = TaskDialog(self.root, "新しいタスクの追加")
-            if dialog.result:
-                time_str, task_names, enabled = dialog.result
-                self.task_manager.config.add_task(time_str, task_names, enabled)
-                self._load_tasks()
-                messagebox.showinfo("完了", "タスクを追加しました。")
-        except Exception as e:
-            logger.error(f"タスクの追加に失敗: {e}", exc_info=True)
-            messagebox.showerror("エラー", f"タスクの追加に失敗しました: {e}")
+        dialog = TaskDialog(self.root, "新しいタスクの追加")
+        if dialog.result:
+            time_str, task_names, enabled = dialog.result
+            self.task_manager.config.add_task(time_str, task_names, enabled)
+            self._load_tasks()
+            messagebox.showinfo("完了", "タスクを追加しました。")
 
     def _edit_task(self):
         """選択されたタスクを編集"""
-        try:
-            selection = self.task_tree.selection()
-            if not selection:
-                messagebox.showwarning("警告", "編集するタスクを選択してください。")
-                return
+        selection = self.task_tree.selection()
+        if not selection:
+            messagebox.showwarning("警告", "編集するタスクを選択してください。")
+            return
 
+        # 選択されたタスクのインデックスを取得
+        item = selection[0]
+        index = self.task_tree.index(item)
+        task = self.task_list[index]
+
+        dialog = TaskDialog(self.root, "タスクの編集", task)
+        if dialog.result:
+            time_str, task_names, enabled = dialog.result
+            self.task_manager.config.update_task(
+                task["id"], time_str, task_names, enabled
+            )
+            self._load_tasks()
+            messagebox.showinfo("完了", "タスクを更新しました。")
+
+    def _delete_task(self):
+        """選択されたタスクを削除"""
+        selection = self.task_tree.selection()
+        if not selection:
+            messagebox.showwarning("警告", "削除するタスクを選択してください。")
+            return
+
+        # 確認ダイアログ
+        if messagebox.askyesno("確認", "選択されたタスクを削除しますか？"):
             # 選択されたタスクのインデックスを取得
             item = selection[0]
             index = self.task_tree.index(item)
             task = self.task_list[index]
 
-            dialog = TaskDialog(self.root, "タスクの編集", task)
-            if dialog.result:
-                time_str, task_names, enabled = dialog.result
-                self.task_manager.config.update_task(
-                    task["id"], time_str, task_names, enabled
-                )
-                self._load_tasks()
-                messagebox.showinfo("完了", "タスクを更新しました。")
-        except Exception as e:
-            logger.error(f"タスクの編集に失敗: {e}", exc_info=True)
-            messagebox.showerror("エラー", f"タスクの編集に失敗しました: {e}")
-
-    def _delete_task(self):
-        """選択されたタスクを削除"""
-        try:
-            selection = self.task_tree.selection()
-            if not selection:
-                messagebox.showwarning("警告", "削除するタスクを選択してください。")
-                return
-
-            # 確認ダイアログ
-            if messagebox.askyesno("確認", "選択されたタスクを削除しますか？"):
-                # 選択されたタスクのインデックスを取得
-                item = selection[0]
-                index = self.task_tree.index(item)
-                task = self.task_list[index]
-
-                self.task_manager.config.delete_task(task["id"])
-                self._load_tasks()
-                messagebox.showinfo("完了", "タスクを削除しました。")
-        except Exception as e:
-            logger.error(f"タスクの削除に失敗: {e}", exc_info=True)
-            messagebox.showerror("エラー", f"タスクの削除に失敗しました: {e}")
+            self.task_manager.config.delete_task(task["id"])
+            self._load_tasks()
+            messagebox.showinfo("完了", "タスクを削除しました。")
 
     def _on_closing(self):
         """ウィンドウが閉じられる時の処理"""
