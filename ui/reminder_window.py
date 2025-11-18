@@ -3,10 +3,13 @@
 予告通知、本通知、警告通知を表示するウィンドウ
 """
 
+import logging
 import threading
 import tkinter as tk
 from tkinter import ttk
 from typing import TYPE_CHECKING, Any
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from task_manager import TaskManager
@@ -28,8 +31,8 @@ class ReminderWindow:
         for child in list(self.root.winfo_children()):
             try:
                 child.destroy()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"ウィジェットの削除中にエラー: {e}")
 
     def switch_to_warning_mode(self):
         """本通知ウィンドウを警告表示に切り替える"""
@@ -265,34 +268,43 @@ class ReminderWindow:
 
     def _complete_tasks(self):
         """タスク完了処理"""
-        if self.notification_type == "main":
-            # すべてチェックされていない場合は警告
-            all_checked = all(var.get() for _, var in self.checkboxes)
-            if not all_checked:
-                from tkinter import messagebox
+        try:
+            if self.notification_type == "main":
+                # すべてチェックされていない場合は警告
+                all_checked = all(var.get() for _, var in self.checkboxes)
+                if not all_checked:
+                    from tkinter import messagebox
 
-                messagebox.showwarning(
-                    "未完了", "すべての項目にチェックを入れてください。"
-                )
-                return
-            # チェックされたタスクをログに記録
-            for task_name, var in self.checkboxes:
-                if var.get():
-                    self.task_manager.mark_task_completed(self.task["id"], task_name)
-        elif self.notification_type == "warning":
-            # 警告通知ではチェックされたものだけ記録
-            any_checked = False
-            for task_name, var in self.checkboxes:
-                if var.get():
-                    self.task_manager.mark_task_completed(self.task["id"], task_name)
-                    any_checked = True
-            if not any_checked:
-                from tkinter import messagebox
+                    messagebox.showwarning(
+                        "未完了", "すべての項目にチェックを入れてください。"
+                    )
+                    return
+                # チェックされたタスクをログに記録
+                for task_name, var in self.checkboxes:
+                    if var.get():
+                        self.task_manager.mark_task_completed(
+                            self.task["id"], task_name
+                        )
+            elif self.notification_type == "warning":
+                # 警告通知ではチェックされたものだけ記録
+                any_checked = False
+                for task_name, var in self.checkboxes:
+                    if var.get():
+                        self.task_manager.mark_task_completed(
+                            self.task["id"], task_name
+                        )
+                        any_checked = True
+                if not any_checked:
+                    from tkinter import messagebox
 
-                messagebox.showinfo("情報", "完了にチェックされた項目がありません。")
-                return
+                    messagebox.showinfo(
+                        "情報", "完了にチェックされた項目がありません。"
+                    )
+                    return
 
-        self._close_window()
+            self._close_window()
+        except Exception as e:
+            logger.error(f"タスク完了処理に失敗: {e}", exc_info=True)
 
     def _close_warning(self):
         """警告通知を閉じる"""

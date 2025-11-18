@@ -2,9 +2,24 @@
 定型作業支援ツール メインアプリケーション
 """
 
+import logging
+import sys
+
 from task_manager import TaskManager
 from ui.main_window import MainWindow
 from ui.reminder_window import ReminderWindow
+
+# logging設定
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler("app.log", encoding="utf-8"),  # 追記モード（デフォルト）
+    ],
+)
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -45,7 +60,7 @@ def main():
         # メインループを開始
         main_window.run()
     except KeyboardInterrupt:
-        print("アプリケーションが中断されました")
+        logger.info("アプリケーションが中断されました")
     finally:
         # クリーンアップ
         task_manager.stop_monitoring()
