@@ -3,12 +3,9 @@
 タスクバーに常駐し、設定画面やログ画面へのアクセスを提供
 """
 
-import logging
 import tkinter as tk
 from tkinter import ttk
 from typing import TYPE_CHECKING
-
-logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from task_manager import TaskManager
@@ -80,31 +77,25 @@ class MainWindow:
 
     def _open_settings(self):
         """設定画面を開く"""
-        try:
-            if self.settings_window is None or not self.settings_window.window_exists():
-                from ui.settings_window import SettingsWindow
+        if self.settings_window is None or not self.settings_window.window_exists():
+            from ui.settings_window import SettingsWindow
 
-                self.settings_window = SettingsWindow(self.task_manager)
-                self.settings_window.create_window()
-            else:
-                self.settings_window.root.lift()
-                self.settings_window.root.focus_force()
-        except Exception as e:
-            logger.error(f"設定画面の表示に失敗: {e}", exc_info=True)
+            self.settings_window = SettingsWindow(self.task_manager)
+            self.settings_window.create_window()
+        else:
+            self.settings_window.root.lift()
+            self.settings_window.root.focus_force()
 
     def _open_log_window(self):
         """ログ画面を開く"""
-        try:
-            if self.log_window is None or not self.log_window.window_exists():
-                from ui.log_window import LogWindow
+        if self.log_window is None or not self.log_window.window_exists():
+            from ui.log_window import LogWindow
 
-                self.log_window = LogWindow(self.task_manager)
-                self.log_window.create_window()
-            else:
-                self.log_window.root.lift()
-                self.log_window.root.focus_force()
-        except Exception as e:
-            logger.error(f"ログ画面の表示に失敗: {e}", exc_info=True)
+            self.log_window = LogWindow(self.task_manager)
+            self.log_window.create_window()
+        else:
+            self.log_window.root.lift()
+            self.log_window.root.focus_force()
 
     def _exit_application(self):
         """アプリケーションを終了"""

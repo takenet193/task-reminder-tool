@@ -1,197 +1,21 @@
 {
   "version": "1.0",
-  "schema_version": 2,
-  "description": "このファイルはAIエージェント向けのタスク指示書です。各タスクはsummaryとMarkdownドキュメントで詳細とレポートを参照できます。",
   "items": [
-    {
-      "id": "setup-tooling",
-      "title": "Lint/Format/型設定",
-      "summary": "開発環境のLint/Formatter/型チェック設定を整備する。",
-      "status": "completed",
-      "start_date": "2025-11-08",
-      "end_date": "2025-11-08",
-      "actual_start_date": "2025-11-08",
-      "actual_end_date": "2025-11-08",
-      "progress_perc": 100,
-      "report_markdown": "docs/reports/setup-tooling.md"
-    },
-    {
-      "id": "io-safety",
-      "title": "原子的書き込み・ロック・バックアップ/復旧",
-      "summary": "設定・タスクファイルの原子的書き込みとロック、バックアップ/復旧を実装する。",
-      "status": "completed",
-      "start_date": "2025-11-10",
-      "end_date": "2025-11-10",
-      "actual_start_date": "2025-11-18",
-      "actual_end_date": "2025-11-18",
-      "progress_perc": 100,
-      "detail_markdown": "docs/tasks/io-safety.md",
-      "report_markdown": "docs/reports/io-safety.md"
-    },
-    {
-      "id": "logging",
-      "title": "ロギング導入",
-      "summary": "アプリ全体にロギング基盤を導入し、主要イベントを記録する。",
-      "status": "completed",
-      "start_date": "2025-11-10",
-      "end_date": "2025-11-10",
-      "actual_start_date": "2025-11-18",
-      "actual_end_date": "2025-11-18",
-      "progress_perc": 100,
-      "detail_markdown": "docs/tasks/logging.md",
-      "report_markdown": "docs/reports/logging.md"
-    },
-    {
-      "id": "schedule-model",
-      "title": "スケジュール拡張",
-      "summary": "タスク・スケジュールのモデルを拡張し、柔軟な通知・スヌーズに対応できるようにする。",
-      "status": "planned",
-      "start_date": "2025-11-11",
-      "end_date": "2025-11-12",
-      "actual_start_date": null,
-      "actual。くｒ。くｒ_end_date": null,
-      "detail_markdown": "docs/tasks/schedule-model.md"
-    },
-    {
-      "id": "schedule-ui",
-      "title": "スケジュールUI",
-      "summary": "スケジュールを確認・編集できるUIを作成する。",
-      "status": "pending",
-      "category": "stretch",
-      "deps": [
-        "schedule-model"
-      ],
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "notifications",
-      "title": "通知ディスパッチ",
-      "summary": "各種通知を集約・ディスパッチする仕組みを実装する。",
-      "status": "pending",
-      "category": "stretch",
-      "deps": [
-        "schedule-model"
-      ],
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "platform-ui",
-      "title": "Win/Mac表示差異吸収",
-      "summary": "Windows/macOSの表示差異を吸収し、共通のUI体験を提供する。",
-      "status": "pending",
-      "category": "stretch",
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "tests-core",
-      "title": "テスト/カバレッジ80%",
-      "summary": "コアロジックの自動テストを追加し、カバレッジを所定の水準まで引き上げる。",
-      "status": "planned",
-      "deps": [
-        "io-safety",
-        "schedule-model"
-      ],
-      "start_date": "2025-11-13",
-      "end_date": "2025-11-14",
-      "target_coverage": ">=60% by 2025-11-14 (80% later)",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/tests-core.md"
-    },
-    {
-      "id": "ci-quality",
-      "title": "CI品質ゲート",
-      "summary": "CI上でテストと品質ゲートを実行し、一定品質を満たさない変更をブロックする。",
-      "status": "planned",
-      "deps": [
-        "tests-core"
-      ],
-      "start_date": "2025-11-14",
-      "end_date": "2025-11-14",
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "package-win",
-      "title": "Windows配布",
-      "summary": "Windows向けの配布パッケージを作成し、配布プロセスを確立する。",
-      "status": "planned",
-      "deps": [
-        "ci-quality"
-      ],
-      "start_date": "2025-11-17",
-      "end_date": "2025-11-17",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/package-win.md"
-    },
-    {
-      "id": "package-mac",
-      "title": "macOS配布",
-      "summary": "macOS向けの配布パッケージを作成し、配布プロセスを確立する。",
-      "status": "pending",
-      "category": "stretch",
-      "deps": [
-        "platform-ui",
-        "ci-quality"
-      ],
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "mcp-automation",
-      "title": "MCP自動化",
-      "summary": "MCPを使った自動化フローを構築し、定型作業を減らす。",
-      "status": "pending",
-      "category": "stretch",
-      "deps": [
-        "ci-quality"
-      ],
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "demo-gif",
-      "title": "デモGIF作成",
-      "summary": "主要なユースケースを示すデモGIFを作成する。",
-      "status": "pending",
-      "category": "stretch",
-      "deps": [
-        "schedule-ui",
-        "notifications"
-      ],
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "arch-diagrams",
-      "title": "アーキ図/通知シーケンス図",
-      "summary": "アーキテクチャ図と通知シーケンス図を作成し、構成とフローを可視化する。",
-      "status": "pending",
-      "category": "stretch",
-      "deps": [
-        "notifications"
-      ],
-      "actual_start_date": null,
-      "actual_end_date": null
-    },
-    {
-      "id": "docs",
-      "title": "README/ARCHITECTURE/CHANGELOG更新",
-      "summary": "READMEやアーキテクチャドキュメント、CHANGELOGを最新状態に更新する。",
-      "status": "planned",
-      "deps": [
-        "package-win"
-      ],
-      "start_date": "2025-11-17",
-      "end_date": "2025-11-17",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/docs.md"
-    }
+    { "id": "setup-tooling", "title": "Lint/Format/型設定", "status": "completed", "actual_start_date": null, "actual_end_date": null },
+    { "id": "io-safety", "title": "原子的書き込み・ロック・バックアップ/復旧", "status": "planned", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": null, "actual_end_date": null },
+    { "id": "logging", "title": "ロギング導入", "status": "planned", "start_date": "2025-11-10", "end_date": "2025-11-10", "actual_start_date": null, "actual_end_date": null },
+    { "id": "schedule-model", "title": "スケジュール拡張", "status": "planned", "start_date": "2025-11-11", "end_date": "2025-11-12", "actual_start_date": null, "actual_end_date": null },
+    { "id": "schedule-ui", "title": "スケジュールUI", "status": "pending", "deps": ["schedule-model"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "notifications", "title": "通知ディスパッチ", "status": "pending", "deps": ["schedule-model"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "platform-ui", "title": "Win/Mac表示差異吸収", "status": "pending", "actual_start_date": null, "actual_end_date": null },
+    { "id": "tests-core", "title": "テスト/カバレッジ80%", "status": "planned", "deps": ["io-safety", "schedule-model"], "start_date": "2025-11-13", "end_date": "2025-11-14", "target_coverage": ">=60% by 2025-11-14 (80% later)", "actual_start_date": null, "actual_end_date": null },
+    { "id": "ci-quality", "title": "CI品質ゲート", "status": "planned", "deps": ["tests-core"], "start_date": "2025-11-14", "end_date": "2025-11-14", "actual_start_date": null, "actual_end_date": null },
+    { "id": "package-win", "title": "Windows配布", "status": "planned", "deps": ["ci-quality"], "start_date": "2025-11-17", "end_date": "2025-11-17", "actual_start_date": null, "actual_end_date": null },
+    { "id": "package-mac", "title": "macOS配布", "status": "pending", "deps": ["platform-ui", "ci-quality"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "mcp-automation", "title": "MCP自動化", "status": "pending", "deps": ["ci-quality"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "demo-gif", "title": "デモGIF作成", "status": "pending", "deps": ["schedule-ui", "notifications"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "arch-diagrams", "title": "アーキ図/通知シーケンス図", "status": "pending", "deps": ["notifications"], "actual_start_date": null, "actual_end_date": null },
+    { "id": "docs", "title": "README/ARCHITECTURE/CHANGELOG更新", "status": "planned", "deps": ["package-win"], "start_date": "2025-11-18", "end_date": "2025-11-19", "actual_start_date": null, "actual_end_date": null }
   ],
   "notes": {
     "strategy": ".cursor/git-strategy.md を参照",
