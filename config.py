@@ -9,6 +9,8 @@ import os
 from datetime import date, datetime
 from typing import Any
 
+from utils.file_io import atomic_write_json
+
 logger = logging.getLogger(__name__)
 
 
@@ -46,24 +48,20 @@ class Config:
     def _save_tasks(self, tasks: list[dict[str, Any]]) -> None:
         """タスクデータをJSONファイルに保存"""
         data = {"tasks": tasks}
-        with open(self.tasks_file, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        atomic_write_json(self.tasks_file, data)
 
     def _save_logs(self, logs: list[dict[str, Any]]) -> None:
         """ログデータをJSONファイルに保存"""
         data = {"logs": logs}
-        with open(self.logs_file, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        atomic_write_json(self.logs_file, data)
 
     def _save_settings(self, settings: dict[str, Any]) -> None:
         """設定データをJSONファイルに保存"""
-        with open(self.settings_file, "w", encoding="utf-8") as f:
-            json.dump(settings, f, ensure_ascii=False, indent=2)
+        atomic_write_json(self.settings_file, settings)
 
     def _save_calendar_overrides(self, overrides: dict[str, dict[str, bool]]) -> None:
         """カレンダーオーバーライドデータをJSONファイルに保存"""
-        with open(self.calendar_overrides_file, "w", encoding="utf-8") as f:
-            json.dump(overrides, f, ensure_ascii=False, indent=2)
+        atomic_write_json(self.calendar_overrides_file, overrides)
 
     def load_tasks(self) -> list[dict[str, Any]]:
         """タスクデータをJSONファイルから読み込み"""
