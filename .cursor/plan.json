@@ -91,17 +91,19 @@
       "id": "tests-core",
       "title": "テスト/カバレッジ80%",
       "summary": "コアロジックの自動テストを追加し、カバレッジを所定の水準まで引き上げる。",
-      "status": "planned",
+      "status": "completed",
       "deps": [
         "io-safety",
         "schedule-model"
       ],
       "start_date": "2025-11-13",
       "end_date": "2025-11-14",
+      "actual_start_date": "2025-11-19",
+      "actual_end_date": "2025-11-19",
+      "progress_perc": 100,
       "target_coverage": ">=60% by 2025-11-14 (80% later)",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/tests-core.md"
+      "detail_markdown": "docs/tasks/tests-core.md",
+      "report_markdown": "docs/reports/tests-core.md"
     },
     {
       "id": "ci-quality",
