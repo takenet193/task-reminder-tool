@@ -1,14 +1,15 @@
 """
 utils/schedule.py のテスト
 """
+
 from datetime import datetime
-import pytest
+
 from utils.schedule import (
-    get_schedule_config,
-    get_task_base_time,
-    calculate_notification_times,
     DEFAULT_PRE_NOTIFICATION_MINUTES,
     DEFAULT_WARNING_MINUTES,
+    calculate_notification_times,
+    get_schedule_config,
+    get_task_base_time,
 )
 
 
@@ -190,5 +191,6 @@ class TestCalculateNotificationTimes:
 
         assert times["pre"] == datetime(2025, 11, 18, 14, 30)  # 0分前 = 本通知と同じ
         assert times["main"] == datetime(2025, 11, 18, 14, 30)
-        assert times["warning"] == datetime(2025, 11, 18, 14, 30)  # 0分後 = 本通知と同じ
-
+        assert times["warning"] == datetime(
+            2025, 11, 18, 14, 30
+        )  # 0分後 = 本通知と同じ

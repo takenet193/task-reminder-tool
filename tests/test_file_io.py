@@ -1,10 +1,14 @@
 """
 utils/file_io.py のテスト
 """
+
 import json
 from pathlib import Path
+from typing import Any
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, mock_open
+
 from utils.file_io import atomic_write_json
 
 
@@ -56,7 +60,7 @@ class TestAtomicWriteJson:
         """JSONエンコードエラーのテスト"""
         filepath = Path(temp_data_dir) / "test.json"
         # 循環参照など、JSONエンコードできないデータ
-        data = {}
+        data: dict[str, Any] = {}
         data["self"] = data  # 循環参照
 
         with pytest.raises((TypeError, ValueError)):
@@ -135,7 +139,7 @@ class TestAtomicWriteJson:
     def test_empty_dict(self, temp_data_dir):
         """空の辞書の書き込み"""
         filepath = Path(temp_data_dir) / "test.json"
-        data = {}
+        data: dict[str, Any] = {}
 
         atomic_write_json(str(filepath), data)
 
@@ -146,7 +150,7 @@ class TestAtomicWriteJson:
     def test_empty_list(self, temp_data_dir):
         """空のリストの書き込み"""
         filepath = Path(temp_data_dir) / "test.json"
-        data = []
+        data: list[Any] = []
 
         atomic_write_json(str(filepath), data)
 
@@ -166,4 +170,3 @@ class TestAtomicWriteJson:
         assert len(loaded["items"]) == 1000
         assert loaded["items"][0]["id"] == 0
         assert loaded["items"][999]["id"] == 999
-

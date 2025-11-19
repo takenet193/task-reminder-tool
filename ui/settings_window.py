@@ -204,7 +204,7 @@ class TaskDialog:
 
         # センターに配置
         self.dialog.geometry(
-            "+%d+%d" % (parent.winfo_rootx() + 50, parent.winfo_rooty() + 50)
+            f"+{parent.winfo_rootx() + 50}+{parent.winfo_rooty() + 50}"
         )
 
         self._create_widgets(task)

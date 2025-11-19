@@ -10,8 +10,8 @@
     - タスク・スケジュールのモデルを拡張し、柔軟な通知・スヌーズに対応できるようにする。 / [仕様](tasks/schedule-model.md)
 - [x] テスト/カバレッジ80% 依存: io-safety, schedule-model （予定: 2025-11-13〜2025-11-14） （実績: 2025-11-19）／>=60% by 2025-11-14 (80% later) → 79%達成
     - コアロジックの自動テストを追加し、カバレッジを所定の水準まで引き上げる。 / [仕様](tasks/tests-core.md) / [レポート](reports/tests-core.md)
-- [ ] CI品質ゲート 依存: tests-core （予定: 2025-11-14）
-    - CI上でテストと品質ゲートを実行し、一定品質を満たさない変更をブロックする。
+- [x] CI品質ゲート 依存: tests-core （予定: 2025-11-14） （実績: 2025-11-19）
+    - CI上でテストと品質ゲートを実行し、一定品質を満たさない変更をブロックする。 / [仕様](tasks/ci-quality.md) / [レポート](reports/ci-quality.md)
 - [ ] Windows配布 依存: ci-quality （予定: 2025-11-17）
     - Windows向けの配布パッケージを作成し、配布プロセスを確立する。 / [仕様](tasks/package-win.md)
 - [ ] README/ARCHITECTURE/CHANGELOG更新 依存: package-win （予定: 2025-11-17）
@@ -49,6 +49,7 @@ gantt
   テスト/カバレッジ80%  :active, 2025-11-13, 2.0d
   テスト/カバレッジ80% 実績 (100%)  :crit, 2025-11-19, 1.0d
   CI品質ゲート  :active, 2025-11-14, 1.0d
+  CI品質ゲート 実績 (100%)  :crit, 2025-11-19, 1.0d
   Windows配布  :active, 2025-11-17, 1.0d
   README/ARCHITECTURE/CHANGELOG更新  :active, 2025-11-17, 1.0d
   section Stretch

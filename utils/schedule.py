@@ -32,12 +32,8 @@ def get_schedule_config(task: dict[str, Any]) -> dict[str, int]:
         "pre_notification_minutes": schedule.get(
             "pre_notification_minutes", DEFAULT_PRE_NOTIFICATION_MINUTES
         ),
-        "warning_minutes": schedule.get(
-            "warning_minutes", DEFAULT_WARNING_MINUTES
-        ),
-        "snooze_minutes": schedule.get(
-            "snooze_minutes", DEFAULT_SNOOZE_MINUTES
-        ),
+        "warning_minutes": schedule.get("warning_minutes", DEFAULT_WARNING_MINUTES),
+        "snooze_minutes": schedule.get("snooze_minutes", DEFAULT_SNOOZE_MINUTES),
     }
 
 
@@ -61,9 +57,7 @@ def get_task_base_time(task: dict[str, Any], current_time: datetime) -> datetime
         if not (0 <= hour <= 23 and 0 <= minute <= 59):
             return None
 
-        return current_time.replace(
-            hour=hour, minute=minute, second=0, microsecond=0
-        )
+        return current_time.replace(hour=hour, minute=minute, second=0, microsecond=0)
     except (ValueError, AttributeError):
         return None
 
@@ -100,12 +94,8 @@ def calculate_notification_times(
     schedule_config = get_schedule_config(task)
 
     return {
-        "pre": base_time - timedelta(
-            minutes=schedule_config["pre_notification_minutes"]
-        ),
+        "pre": base_time
+        - timedelta(minutes=schedule_config["pre_notification_minutes"]),
         "main": base_time,
-        "warning": base_time + timedelta(
-            minutes=schedule_config["warning_minutes"]
-        ),
+        "warning": base_time + timedelta(minutes=schedule_config["warning_minutes"]),
     }
-
