@@ -1,12 +1,9 @@
 """
 config.py のテスト
 """
-import json
+
 import os
-from pathlib import Path
 from datetime import date, datetime
-import pytest
-from config import Config
 
 
 class TestConfigTasks:
@@ -248,7 +245,7 @@ class TestConfigCalendarOverrides:
     def test_get_task_created_date(self, config_with_temp_dir):
         """タスクの登録日時の取得"""
         config = config_with_temp_dir
-        task_id = config.add_task("14:30", ["日報"])
+        config.add_task("14:30", ["日報"])
 
         tasks = config.load_tasks()
         task = tasks[0]
@@ -273,4 +270,3 @@ class TestConfigCalendarOverrides:
 
         overrides = config.load_calendar_overrides()
         assert overrides == {}
-

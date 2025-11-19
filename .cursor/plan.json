@@ -109,14 +109,17 @@
       "id": "ci-quality",
       "title": "CI品質ゲート",
       "summary": "CI上でテストと品質ゲートを実行し、一定品質を満たさない変更をブロックする。",
-      "status": "planned",
+      "status": "completed",
       "deps": [
         "tests-core"
       ],
       "start_date": "2025-11-14",
       "end_date": "2025-11-14",
-      "actual_start_date": null,
-      "actual_end_date": null
+      "actual_start_date": "2025-11-19",
+      "actual_end_date": "2025-11-19",
+      "progress_perc": 100,
+      "detail_markdown": "docs/tasks/ci-quality.md",
+      "report_markdown": "docs/reports/ci-quality.md"
     },
     {
       "id": "package-win",

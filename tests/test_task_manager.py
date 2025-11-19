@@ -1,9 +1,12 @@
 """
 task_manager.py のテスト
 """
+
 from datetime import datetime
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, patch
+
 from task_manager import TaskManager
 
 
@@ -297,4 +300,3 @@ class TestTaskManagerClearNotificationHistory:
         assert today_key in manager.active_notifications
         # 昨日の通知は削除される
         assert yesterday_key not in manager.active_notifications
-

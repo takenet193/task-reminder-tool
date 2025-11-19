@@ -8,7 +8,7 @@ import re
 import threading
 import time
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from config import Config
@@ -76,7 +76,9 @@ class TaskManager:
                     )
 
                     # 予告通知
-                    if self._should_trigger_notification(
+                    if notification_times[
+                        "pre"
+                    ] is not None and self._should_trigger_notification(
                         current_time,
                         notification_times["pre"],
                         task["id"],
@@ -85,7 +87,9 @@ class TaskManager:
                         self._trigger_pre_notification(task)
 
                     # 本通知
-                    if self._should_trigger_notification(
+                    if notification_times[
+                        "main"
+                    ] is not None and self._should_trigger_notification(
                         current_time,
                         notification_times["main"],
                         task["id"],
@@ -94,7 +98,9 @@ class TaskManager:
                         self._trigger_main_notification(task)
 
                     # 警告通知（未完了の場合のみ）
-                    if self._should_trigger_notification(
+                    if notification_times[
+                        "warning"
+                    ] is not None and self._should_trigger_notification(
                         current_time,
                         notification_times["warning"],
                         task["id"],
