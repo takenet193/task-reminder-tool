@@ -14,7 +14,7 @@
     - CI上でテストと品質ゲートを実行し、一定品質を満たさない変更をブロックする。 / [仕様](tasks/ci-quality.md) / [レポート](reports/ci-quality.md)
 - [x] Windows配布 依存: ci-quality （予定: 2025-11-17） （実績: 2025-11-19〜2025-11-20）
     - Windows向けの配布パッケージを作成し、配布プロセスを確立する。 / [仕様](tasks/package-win.md) / [レポート](reports/package-win.md)
-- [ ] README/ARCHITECTURE/CHANGELOG更新 依存: package-win （予定: 2025-11-17）
+- [x] README/ARCHITECTURE/CHANGELOG更新 依存: package-win （予定: 2025-11-17） （実績: 2025-11-20）
     - READMEやアーキテクチャドキュメント、CHANGELOGを最新状態に更新する。 / [仕様](tasks/docs.md)
 
 - [ ] スケジュールUI 依存: schedule-model
@@ -54,6 +54,7 @@ gantt
   Windows配布  :active, 2025-11-17, 1.0d
   Windows配布 実績 (100%)  :crit, 2025-11-19, 2.0d
   README/ARCHITECTURE/CHANGELOG更新  :active, 2025-11-17, 1.0d
+  README/ARCHITECTURE/CHANGELOG更新 実績 (100%)  :crit, 2025-11-20, 1.0d
   section Stretch
   %% スケジュールUI (日付未定)
   %% 通知ディスパッチ (日付未定)
