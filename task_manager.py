@@ -8,10 +8,11 @@ import re
 import threading
 import time
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from config import Config
+from utils.schedule import calculate_notification_times, get_task_base_time
 
 logger = logging.getLogger(__name__)
 
@@ -65,39 +66,46 @@ class TaskManager:
                     if not task.get("enabled", True):
                         continue
 
-                    task_time_str = task["time"]
-                    task_time = self._parse_time(task_time_str)
-
-                    if task_time is None:
+                    # 純粋関数で通知時刻を計算
+                    base_time = get_task_base_time(task, current_time)
+                    if base_time is None:
                         continue
 
-                    # 今日のタスク時刻を計算
-                    today_task_time = current_time.replace(
-                        hour=task_time.hour,
-                        minute=task_time.minute,
-                        second=0,
-                        microsecond=0,
+                    notification_times = calculate_notification_times(
+                        task, current_time, base_time
                     )
 
-                    # 予告通知(5分前)
-                    pre_notification_time = today_task_time - timedelta(minutes=5)
-                    if self._should_trigger_notification(
-                        current_time, pre_notification_time, task["id"], "pre"
+                    # 予告通知
+                    if notification_times[
+                        "pre"
+                    ] is not None and self._should_trigger_notification(
+                        current_time,
+                        notification_times["pre"],
+                        task["id"],
+                        "pre",
                     ):
                         self._trigger_pre_notification(task)
 
-                    # 本通知(設定時刻)
-                    if self._should_trigger_notification(
-                        current_time, today_task_time, task["id"], "main"
+                    # 本通知
+                    if notification_times[
+                        "main"
+                    ] is not None and self._should_trigger_notification(
+                        current_time,
+                        notification_times["main"],
+                        task["id"],
+                        "main",
                     ):
                         self._trigger_main_notification(task)
 
-                    # 警告通知(5分後、未完了の場合)
-                    warning_time = today_task_time + timedelta(minutes=5)
-                    if self._should_trigger_notification(
-                        current_time, warning_time, task["id"], "warning"
+                    # 警告通知（未完了の場合のみ）
+                    if notification_times[
+                        "warning"
+                    ] is not None and self._should_trigger_notification(
+                        current_time,
+                        notification_times["warning"],
+                        task["id"],
+                        "warning",
                     ):
-                        # タスクが未完了の場合のみ警告通知を発火
                         if not self._is_task_completed(
                             task["id"], current_time.strftime("%Y-%m-%d")
                         ):

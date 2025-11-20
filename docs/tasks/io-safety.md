@@ -314,7 +314,7 @@ def test_atomic_write_json_backup_restore():
 実装後のファイル構造：
 
 ```
-定型作業支援ツール/
+TaskReminder/
 ├── utils/
 │   ├── __init__.py
 │   └── file_io.py          # 新規作成: 原子的書き込み関数

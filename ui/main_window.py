@@ -24,7 +24,7 @@ class MainWindow:
     def create_window(self):
         """メインウィンドウを作成"""
         self.root = tk.Tk()
-        self.root.title("定型作業支援ツール")
+        self.root.title("TaskReminder")
         self.root.geometry("300x150")
         self.root.resizable(False, False)
 
@@ -45,7 +45,7 @@ class MainWindow:
 
         # タイトル
         title_label = ttk.Label(
-            main_frame, text="定型作業支援ツール", font=("Arial", 12, "bold")
+            main_frame, text="TaskReminder", font=("Arial", 12, "bold")
         )
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 10), sticky="")
 
