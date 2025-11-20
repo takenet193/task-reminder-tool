@@ -72,9 +72,15 @@ GitHub Releasesに記載されているSHA256ハッシュ値と一致するこ�
 ### 開発者向けインストール（Python環境が必要）
 
 #### 必要な環境
-- Python 3.7以上
+- Python 3.13以上（推奨）
 - tkinter（Python標準ライブラリ）
 - matplotlib
+
+#### 開発ツール（オプション）
+- ruff: リントチェック
+- black: コードフォーマット
+- mypy: 型チェック
+- pytest: テスト実行
 
 #### インストール手順
 
@@ -107,6 +113,36 @@ bash mcp_setup/scripts/generate_mcp_config.sh /path/to/your/workspace
 ```bash
 python main.py
 ```
+
+#### 開発環境での品質チェック
+
+CIと同じ品質チェックをローカルで実行できます：
+
+**Linux/macOS:**
+```bash
+bash scripts/ci-check.sh
+```
+
+**Windows:**
+```powershell
+.\scripts\ci-check.ps1
+```
+
+このスクリプトは以下のチェックを実行します：
+- テスト実行とカバレッジチェック（60%以上）
+- ruffリントチェック
+- blackフォーマットチェック
+- mypy型チェック
+
+#### CI/CD
+
+このプロジェクトはGitHub Actionsで自動的に品質チェックを実行します：
+- **テスト**: pytest実行とカバレッジチェック（60%以上）
+- **リント**: ruffリントチェック
+- **フォーマット**: blackフォーマットチェック
+- **型チェック**: mypy型チェック
+
+プルリクエストや`main`/`develop`ブランチへのプッシュ時に自動実行されます。
 
 ### 基本的な使用方法
 
@@ -319,9 +355,24 @@ TaskReminder/
 
 バグ報告や機能要望は、GitHubのIssueページでお知らせください。
 
+## 品質管理
+
+このプロジェクトは以下の品質管理ツールを使用しています：
+
+- **テストカバレッジ**: 79%（目標: 60%以上）
+- **リント**: ruff
+- **フォーマット**: black
+- **型チェック**: mypy
+
+詳細は[CHANGELOG.md](CHANGELOG.md)を参照してください。
+
 ## 更新履歴
+
+詳細な変更履歴は[CHANGELOG.md](CHANGELOG.md)を参照してください。
 
 - v1.0.0: 初回リリース
   - 基本的なリマインダー機能
   - タスク設定機能
   - ログ・達成率表示機能
+  - CI品質ゲート
+  - Windows版exeファイル配布

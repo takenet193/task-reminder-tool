@@ -191,15 +191,17 @@
       "id": "docs",
       "title": "README/ARCHITECTURE/CHANGELOG更新",
       "summary": "READMEやアーキテクチャドキュメント、CHANGELOGを最新状態に更新する。",
-      "status": "planned",
+      "status": "completed",
       "deps": [
         "package-win"
       ],
       "start_date": "2025-11-17",
       "end_date": "2025-11-17",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/docs.md"
+      "actual_start_date": "2025-11-20",
+      "actual_end_date": "2025-11-20",
+      "progress_perc": 100,
+      "detail_markdown": "docs/tasks/docs.md",
+      "report_markdown": "docs/reports/docs.md"
     }
   ],
   "notes": {
