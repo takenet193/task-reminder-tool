@@ -1,0 +1,99 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build Windows Executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller main.spec --clean --noconfirm
+
+      - name: Get file size
+        id: file_size
+        run: |
+          $exePath = "dist\TaskReminder.exe"
+          $fileSize = (Get-Item $exePath).Length
+          $fileSizeMB = [math]::Round($fileSize / 1MB, 2)
+          echo "size_mb=$fileSizeMB" >> $env:GITHUB_OUTPUT
+          echo "File size: $fileSizeMB MB"
+        shell: pwsh
+
+      - name: Generate checksum
+        id: checksum
+        run: |
+          $exePath = "dist\TaskReminder.exe"
+          $hash = Get-FileHash -Path $exePath -Algorithm SHA256
+          echo "sha256=$($hash.Hash)" >> $env:GITHUB_OUTPUT
+          echo "SHA256: $($hash.Hash)"
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-executable
+          path: dist/TaskReminder.exe
+          retention-days: 30
+
+      - name: Create release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/TaskReminder.exe
+          body: |
+            ## Windows版リリース
+
+            ### ダウンロード
+            - **ファイル**: `TaskReminder.exe`
+            - **サイズ**: ${{ steps.file_size.outputs.size_mb }} MB
+            - **SHA256**: `${{ steps.checksum.outputs.sha256 }}`
+
+            ### インストール方法
+            1. `TaskReminder.exe`をダウンロード
+            2. ダウンロードしたexeファイルをダブルクリックして起動
+            3. 初回起動時に`data/`ディレクトリが自動作成されます
+
+            ### システム要件
+            - Windows 10以降
+            - 管理者権限不要
+
+            ### トラブルシューティング
+            - **ウイルススキャンの誤検知**: PyInstallerで生成したexeは誤検知されやすい場合があります。信頼できるソースからのダウンロードであることを確認してください。
+            - **起動が遅い**: 初回起動時は一時ファイルの展開により、やや時間がかかることがあります。
+
+            ### チェックサム検証
+            ```powershell
+            Get-FileHash -Path "TaskReminder.exe" -Algorithm SHA256
+            ```
+
+            上記コマンドで表示されるハッシュ値が、上記のSHA256と一致することを確認してください。
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

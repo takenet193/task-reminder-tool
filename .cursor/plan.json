@@ -125,15 +125,17 @@
       "id": "package-win",
       "title": "Windows配布",
       "summary": "Windows向けの配布パッケージを作成し、配布プロセスを確立する。",
-      "status": "planned",
+      "status": "completed",
       "deps": [
         "ci-quality"
       ],
       "start_date": "2025-11-17",
       "end_date": "2025-11-17",
-      "actual_start_date": null,
-      "actual_end_date": null,
-      "detail_markdown": "docs/tasks/package-win.md"
+      "actual_start_date": "2025-11-19",
+      "actual_end_date": "2025-11-20",
+      "progress_perc": 100,
+      "detail_markdown": "docs/tasks/package-win.md",
+      "report_markdown": "docs/reports/package-win.md"
     },
     {
       "id": "package-mac",
