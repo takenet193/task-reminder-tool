@@ -83,7 +83,7 @@
   - **`warning_minutes`** (int, デフォルト: 5): 警告通知を発火する分数（タスク時刻の何分後か）
   - **`snooze_minutes`** (int, デフォルト: 5): スヌーズ機能で使用する分数（将来の拡張用）
 
-**注意**: 
+**注意**:
 - `schedule` フィールドが存在しない既存タスクは、デフォルト値（5分前、5分後）で動作する
 - 将来的な拡張（`repeat`, `paused_until` など）のために、辞書構造を採用
 
@@ -457,7 +457,7 @@ def test_calculate_notification_times():
 実装後のファイル構造：
 
 ```
-定型作業支援ツール/
+TaskReminder/
 ├── utils/
 │   ├── __init__.py
 │   ├── file_io.py          # 既存: 原子的書き込み関数

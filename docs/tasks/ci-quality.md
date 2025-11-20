@@ -98,30 +98,30 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.13"]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Run tests with coverage
         run: |
           pytest --cov=. --cov-report=xml --cov-report=term-missing
-      
+
       - name: Check coverage threshold
         run: |
           coverage report --fail-under=60
-      
+
       - name: Upload coverage to Codecov (optional)
         uses: codecov/codecov-action@v3
         with:
@@ -133,26 +133,26 @@ jobs:
   lint:
     name: Lint and Format Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           cache: 'pip'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Run ruff linter
         run: |
           ruff check .
-      
+
       - name: Check black formatting
         run: |
           black --check .
@@ -160,22 +160,22 @@ jobs:
   type-check:
     name: Type Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           cache: 'pip'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Run mypy
         run: |
           mypy . --config-file pyproject.toml
@@ -432,7 +432,7 @@ act -j type-check
 実装後のファイル構造：
 
 ```
-定型作業支援ツール/
+TaskReminder/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml              # 新規作成: CI品質ゲートワークフロー
@@ -499,4 +499,3 @@ act -j type-check
 - black公式ドキュメント: https://black.readthedocs.io/
 - mypy公式ドキュメント: https://mypy.readthedocs.io/
 - act（GitHub Actionsローカル実行）: https://github.com/nektos/act
-

@@ -6,6 +6,7 @@ JSONファイルの読み書きとタスク・ログデータの管理を行う
 import json
 import logging
 import os
+import sys
 from datetime import date, datetime
 from typing import Any
 
@@ -14,9 +15,28 @@ from utils.file_io import atomic_write_json
 logger = logging.getLogger(__name__)
 
 
+def _get_base_dir() -> str:
+    """
+    exe環境と開発環境の両方に対応したベースディレクトリを取得
+
+    Returns:
+        str: ベースディレクトリのパス
+    """
+    # PyInstallerでパッケージ化されている場合
+    if getattr(sys, "frozen", False):
+        # exeファイルのディレクトリを取得
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        # 開発環境では現在のディレクトリを使用
+        base_dir = os.getcwd()
+    return base_dir
+
+
 class Config:
     def __init__(self):
-        self.data_dir = "data"
+        # exe環境と開発環境の両方に対応
+        base_dir = _get_base_dir()
+        self.data_dir = os.path.join(base_dir, "data")
         self.tasks_file = os.path.join(self.data_dir, "tasks.json")
         self.logs_file = os.path.join(self.data_dir, "logs.json")
         self.settings_file = os.path.join(self.data_dir, "settings.json")

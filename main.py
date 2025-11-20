@@ -1,21 +1,43 @@
 """
-定型作業支援ツール メインアプリケーション
+TaskReminder メインアプリケーション
 """
 
 import logging
+import os
 import sys
 
 from task_manager import TaskManager
 from ui.main_window import MainWindow
 from ui.reminder_window import ReminderWindow
 
+
+def _get_log_file_path() -> str:
+    """
+    exe環境と開発環境の両方に対応したログファイルのパスを取得
+
+    Returns:
+        str: ログファイルのパス
+    """
+    # PyInstallerでパッケージ化されている場合
+    if getattr(sys, "frozen", False):
+        # exeファイルのディレクトリを取得
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        # 開発環境では現在のディレクトリを使用
+        base_dir = os.getcwd()
+    return os.path.join(base_dir, "app.log")
+
+
 # logging設定
+log_file_path = _get_log_file_path()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler("app.log", encoding="utf-8"),  # 追記モード（デフォルト）
+        logging.FileHandler(
+            log_file_path, encoding="utf-8"
+        ),  # 追記モード（デフォルト）
     ],
 )
 
