@@ -61,39 +61,12 @@ jobs:
           path: dist/TaskReminder.exe
           retention-days: 30
 
-      - name: Create release
+      - name: Upload to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
           files: dist/TaskReminder.exe
-          body: |
-            ## Windows版リリース
-
-            ### ダウンロード
-            - **ファイル**: `TaskReminder.exe`
-            - **サイズ**: ${{ steps.file_size.outputs.size_mb }} MB
-            - **SHA256**: `${{ steps.checksum.outputs.sha256 }}`
-
-            ### インストール方法
-            1. `TaskReminder.exe`をダウンロード
-            2. ダウンロードしたexeファイルをダブルクリックして起動
-            3. 初回起動時に`data/`ディレクトリが自動作成されます
-
-            ### システム要件
-            - Windows 10以降
-            - 管理者権限不要
-
-            ### トラブルシューティング
-            - **ウイルススキャンの誤検知**: PyInstallerで生成したexeは誤検知されやすい場合があります。信頼できるソースからのダウンロードであることを確認してください。
-            - **起動が遅い**: 初回起動時は一時ファイルの展開により、やや時間がかかることがあります。
-
-            ### チェックサム検証
-            ```powershell
-            Get-FileHash -Path "TaskReminder.exe" -Algorithm SHA256
-            ```
-
-            上記コマンドで表示されるハッシュ値が、上記のSHA256と一致することを確認してください。
-          draft: false
-          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          update: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
