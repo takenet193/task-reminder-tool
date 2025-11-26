@@ -1,0 +1,188 @@
+{
+  "version": "1.0",
+  "description": "ポートフォリオ自動生成システムの設定ファイル。AIが参照して実装に使用する。",
+  "excel_template": {
+    "file": "ポートフォリオ_Template_ver2.0.xlsx",
+    "sheet": "フォーマット"
+  },
+  "cell_mapping": {
+    "日付": {
+      "cell": "D3",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "git",
+      "transform": "date_format",
+      "description": "Git履歴から最終コミット日を取得し、'YYYY年/MM月/DD日'形式に変換"
+    },
+    "タイトル": {
+      "cell": "D4",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "plan.json",
+      "field": "items[].title",
+      "description": "plan.jsonからタスクのタイトルを取得"
+    },
+    "テーマ選定の理由": {
+      "cell": "D5",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "manual",
+      "description": "手動入力または設定ファイルから取得"
+    },
+    "対象企業": {
+      "cell": "D6",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "manual",
+      "description": "手動入力または設定ファイルから取得"
+    },
+    "対象職": {
+      "cell": "D7",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "manual",
+      "description": "手動入力または設定ファイルから取得"
+    },
+    "対象スキルセット": {
+      "cell": "D8",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "requirements.txt",
+      "transform": "extract_technologies",
+      "description": "requirements.txtから主要な技術を抽出してカンマ区切りで表示"
+    },
+    "背景": {
+      "cell": "D9",
+      "row_count": 6,
+      "merged_range": "D9:L14",
+      "estimated_chars": 300,
+      "source": "report",
+      "section": "背景",
+      "transform": "summarize_to_length",
+      "description": "レポートから背景セクションを抽出し、約300文字に要約"
+    },
+    "目的": {
+      "cell": "D15",
+      "row_count": 6,
+      "merged_range": "D15:L20",
+      "estimated_chars": 300,
+      "source": "plan.json",
+      "field": "items[].summary",
+      "transform": "expand_to_length",
+      "description": "plan.jsonから目的を取得し、約300文字に拡張"
+    },
+    "概要": {
+      "cell": "D21",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "report",
+      "section": "実施概要",
+      "transform": "first_paragraph",
+      "description": "レポートの実施概要セクションの最初の段落を抽出（約50文字）"
+    },
+    "アプローチの理由": {
+      "cell": "D22",
+      "row_count": 6,
+      "merged_range": "D22:L27",
+      "estimated_chars": 300,
+      "source": "report",
+      "section": "実装内容",
+      "transform": "extract_approach",
+      "description": "レポートの実装内容からアプローチの理由を抽出し、約300文字に要約"
+    },
+    "成果物の概要": {
+      "cell": "D28",
+      "row_count": 6,
+      "merged_range": "D28:L33",
+      "estimated_chars": 300,
+      "source": "report",
+      "section": "実施概要",
+      "transform": "summarize_to_length",
+      "description": "レポートの実施概要から成果物の概要を抽出し、約300文字に要約"
+    },
+    "使用した技術": {
+      "cell": "B36",
+      "row_count": 1,
+      "estimated_chars": 50,
+      "source": "requirements.txt",
+      "transform": "list_technologies",
+      "description": "requirements.txtから主要な技術を抽出してカンマ区切りで表示"
+    },
+    "成果": {
+      "cell": "D37",
+      "row_count": 6,
+      "merged_range": "D37:L42",
+      "estimated_chars": 300,
+      "source": "report",
+      "section": "成果",
+      "transform": "summarize_to_length",
+      "description": "レポートの成果セクションを抽出し、約300文字に要約"
+    },
+    "効果": {
+      "cell": "D43",
+      "row_count": 6,
+      "merged_range": "D43:L48",
+      "estimated_chars": 300,
+      "source": "report",
+      "section": "効果",
+      "transform": "summarize_to_length",
+      "description": "レポートの効果セクションを抽出し、約300文字に要約"
+    },
+    "工夫点・改善点": {
+      "cell": "D49",
+      "row_count": 6,
+      "merged_range": "D49:L54",
+      "estimated_chars": 300,
+      "source": "report",
+      "section": "実装内容",
+      "transform": "extract_improvements",
+      "description": "レポートの実装内容から工夫点・改善点を抽出し、約300文字に要約"
+    }
+  },
+  "data_sources": {
+    "reports": {
+      "path": "docs/reports/*.md",
+      "format": "markdown"
+    },
+    "git": {
+      "command": "git log",
+      "date_format": "YYYY年/MM月/DD日"
+    },
+    "plan": {
+      "paths": [
+        ".cursor/plan.json",
+        ".cursor/*.plan.json"
+      ],
+      "format": "json",
+      "merge_strategy": "merge_items",
+      "description": "複数のplanファイルを指定可能。ワイルドカード（*.plan.json）で複数ファイルを自動検出。実行時に--planオプションで特定のファイルを指定することも可能。"
+    },
+    "requirements": {
+      "path": "requirements.txt",
+      "format": "text"
+    }
+  },
+  "text_transforms": {
+    "summarize_to_length": {
+      "description": "指定された文字数に要約する",
+      "max_chars": 300,
+      "min_chars": 200
+    },
+    "expand_to_length": {
+      "description": "指定された文字数に拡張する",
+      "target_chars": 300
+    },
+    "first_paragraph": {
+      "description": "最初の段落を抽出（約50文字）",
+      "max_chars": 50
+    },
+    "extract_technologies": {
+      "description": "requirements.txtから主要な技術を抽出",
+      "exclude": ["pytest", "pytest-cov", "ruff", "black", "mypy"]
+    },
+    "date_format": {
+      "description": "日付を'YYYY年/MM月/DD日'形式に変換",
+      "format": "%Y年/%m月/%d日"
+    }
+  }
+}
