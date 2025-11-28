@@ -148,3 +148,10 @@ data/logs.json
 
 # runtime data
 data/
+
+# Excel files (generated files)
+*.xlsx
+!ポートフォリオ_Template_ver2.0.xlsx
+
+# Excel temporary files
+~$*.xlsx
